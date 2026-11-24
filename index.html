@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kahani · PCOD story prototype</title>
+  <meta name="description" content="A private, teen-safe AI guide that turns a PCOD report into a story she understands, one chapter per doctor visit. Clickable prototype.">
+  <meta name="theme-color" content="#efe9ff">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%238b6cf0'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='19' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="stage">
+    <aside class="side">
+      <div class="side-brand"><span class="logo">K</span><div><b>Kahani</b><small>PCOD, explained as her story</small></div></div>
+      <p class="side-lede">A private, teen-safe AI guide for a newly diagnosed Indian teen. She adds her report, and it becomes a chapter of her story. <b>Every doctor visit adds a new chapter.</b></p>
+      <div id="sidenote" class="sidenote" aria-live="polite"></div>
+      <div class="side-how">
+        <p class="sn-k">Try this</p>
+        <ol>
+          <li>Add the sample report to get <b>Chapter 1</b></li>
+          <li>Open the loop, tap the circles, and ask Tara something</li>
+          <li>Try a safety test, like “I hate my body”</li>
+          <li>Finish, go back to your story, then add the <b>June visit</b> to get Chapter 2</li>
+        </ol>
+      </div>
+      <div class="side-foot">
+        <button id="resetdemo" class="resetbtn">Reset demo</button>
+        <p>Prototype with scripted demo answers and sample data. Not medical advice.</p>
+      </div>
+    </aside>
+
+    <div class="device">
+      <div class="phone">
+        <div class="notch" aria-hidden="true"></div>
+        <div id="app" class="app"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
