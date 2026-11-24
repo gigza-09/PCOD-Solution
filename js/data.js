@@ -34,15 +34,15 @@ KAHANI.reports = {
     },
     status: 'risk',
     items: [
-      { id: 'cycle', icon: 'calendar', plain: 'Your periods come every 45–60 days', raw: 'Menstrual history', node: 'period' },
-      { id: 'acne', icon: 'spark', plain: 'Acne along your jawline', raw: 'Clinical', node: 'ovary' },
-      { id: 'hair', icon: 'leaf', plain: 'Some hair on your chin and upper lip', raw: 'Clinical', node: 'ovary' },
-      { id: 'lh', icon: 'signal', plain: 'Your brain’s “grow” signal (LH) is louder than usual', raw: 'LH 14.2 · LH:FSH 2.8', node: 'brain' },
-      { id: 'testo', icon: 'drop', plain: 'Testosterone is a little above the usual range', raw: 'Total testosterone 68', node: 'ovary' },
-      { id: 'insulin', icon: 'bolt', plain: 'Insulin is at the upper end of normal', raw: 'Fasting insulin 19', node: 'insulin' },
-      { id: 'ruled', icon: 'check', plain: 'Thyroid and prolactin are normal, so those causes are ruled out', raw: 'TSH / Prolactin', node: null },
-      { id: 'scan', icon: 'info', plain: 'The scan mentions “PCO morphology”. Doctors don’t use scans to diagnose teens, so this is a side note', raw: 'USG pelvis', node: 'follicle' },
-      { id: 'note', icon: 'pen', plain: 'Doctor wrote “probable PCOD”, with a re-check in 3 months', raw: 'Impression', node: null }
+      { id: 'cycle', icon: 'calendar', plain: 'Periods every 45–60 days', tag: 'Every 45–60 days', node: 'period' },
+      { id: 'acne', icon: 'spark', plain: 'Acne along your jaw', tag: 'Jaw acne', node: 'ovary' },
+      { id: 'hair', icon: 'leaf', plain: 'Some hair on chin and upper lip', tag: 'Chin hair', node: 'ovary' },
+      { id: 'lh', icon: 'signal', plain: 'Brain’s “grow” signal (LH) is loud', tag: 'LH loud', node: 'brain' },
+      { id: 'testo', icon: 'drop', plain: 'Testosterone a little high', tag: 'Testosterone ↑', node: 'ovary' },
+      { id: 'insulin', icon: 'bolt', plain: 'Insulin at the upper end', tag: 'Insulin ↑', node: 'insulin' },
+      { id: 'ruled', icon: 'check', plain: 'Thyroid and prolactin are normal', tag: 'Thyroid normal', node: null },
+      { id: 'scan', icon: 'info', plain: 'Scan note (scans don’t diagnose teens)', tag: 'Scan note', node: 'follicle' },
+      { id: 'note', icon: 'pen', plain: 'Doctor: “probable PCOD”, re-check in 3 months', tag: 'Probable PCOD', node: null }
     ],
     levels: { brain: 3, ovary: 2, follicle: 3, period: 3, insulin: 2 },
     facts: { cycle: '45–60 days', lh: 'loud', testo: 'a little high', insulin: 'upper end' },
@@ -79,14 +79,14 @@ KAHANI.reports = {
     },
     status: 'diagnosed',
     items: [
-      { id: 'cycle', icon: 'calendar', plain: 'Your periods now come every 32–38 days', raw: 'Menstrual history', node: 'period' },
-      { id: 'acne', icon: 'spark', plain: 'Your acne is better', raw: 'Clinical', node: 'ovary' },
-      { id: 'hair', icon: 'leaf', plain: 'Chin and upper-lip hair is about the same', raw: 'Clinical', node: 'ovary' },
-      { id: 'lh', icon: 'signal', plain: 'Your brain’s LH signal is calmer', raw: 'LH 9.1 · LH:FSH 1.6', node: 'brain' },
-      { id: 'testo', icon: 'drop', plain: 'Testosterone is back inside the usual range', raw: 'Total testosterone 52', node: 'ovary' },
-      { id: 'insulin', icon: 'bolt', plain: 'Insulin has come down a bit', raw: 'Fasting insulin 14', node: 'insulin' },
-      { id: 'treat', icon: 'pill', plain: 'You’re on the treatment your doctor started. I won’t comment on medicines, that’s your doctor’s call', raw: 'Current treatment', node: null },
-      { id: 'note', icon: 'pen', plain: 'Doctor wrote “PCOS confirmed”, which is the same as PCOD, with a review in 6 months', raw: 'Impression', node: null }
+      { id: 'cycle', icon: 'calendar', plain: 'Periods every 32–38 days', tag: 'Every 32–38 days', node: 'period' },
+      { id: 'acne', icon: 'spark', plain: 'Acne is better', tag: 'Acne better', node: 'ovary' },
+      { id: 'hair', icon: 'leaf', plain: 'Chin and lip hair about the same', tag: 'Chin hair same', node: 'ovary' },
+      { id: 'lh', icon: 'signal', plain: 'LH signal is calmer', tag: 'LH calmer', node: 'brain' },
+      { id: 'testo', icon: 'drop', plain: 'Testosterone back in range', tag: 'Testosterone OK', node: 'ovary' },
+      { id: 'insulin', icon: 'bolt', plain: 'Insulin came down a bit', tag: 'Insulin ↓', node: 'insulin' },
+      { id: 'treat', icon: 'pill', plain: 'On your doctor’s treatment', tag: 'On treatment', node: null },
+      { id: 'note', icon: 'pen', plain: 'Doctor: “PCOS confirmed”, review in 6 months', tag: 'Confirmed', node: null }
     ],
     levels: { brain: 2, ovary: 1, follicle: 2, period: 1, insulin: 1 },
     facts: { cycle: '32–38 days', lh: 'calmer', testo: 'in range', insulin: 'lower' },
@@ -101,11 +101,11 @@ KAHANI.reports = {
 };
 
 KAHANI.statusInfo = {
-  risk: { label: 'At risk · doctor will re-check', short: 'At risk', tone: 'amber',
+  risk: { label: 'At risk · doctor will re-check', short: 'At risk', tone: 'amber', tip: 'Your doctor will re-check. That’s a plan, not limbo.',
     line: '“Probable” means your doctor is watching for a bit longer before deciding. That’s normal for teens: periods can be irregular for a few years after they start, so doctors wait and re-check. It’s a plan, not limbo.' },
-  diagnosed: { label: 'Diagnosed by your doctor', short: 'Diagnosed', tone: 'lav',
+  diagnosed: { label: 'Diagnosed by your doctor', short: 'Diagnosed', tone: 'lav', tip: 'Confirmed by your doctor. Now there’s a clear plan.',
     line: 'Your doctor has now confirmed it. That can feel big, but it mostly means there’s a clear plan. Nothing about you changed overnight.' },
-  unsure: { label: 'Not sure yet', short: 'Not sure yet', tone: 'blue',
+  unsure: { label: 'Not sure yet', short: 'Not sure yet', tone: 'blue', tip: 'Still being checked. That’s normal at your age.',
     line: 'Nothing is decided yet. Doctors look at your cycles over time and at signs like acne or extra hair, and they rule out other causes first.' }
 };
 
@@ -260,14 +260,4 @@ KAHANI.mum = {
     improved: 'Mere periods pehle se zyada regular hain.',
     asks: 'Meri help ke liye: please relatives ke saamne mere weight, skin ya shaadi ki baat mat karna. Agar aap mere liye koi gharelu nuskha try kar rahe ho, toh chalo doctor ko saath mein batate hain. Kya aap next visit pe mere saath chaloge?'
   }
-};
-
-/* ---------- Side-panel notes: what each screen demonstrates ---------- */
-KAHANI.notes = {
-  home: { title: 'Her story', body: 'Each doctor visit adds a chapter. Nothing is saved unless she turns on “Keep my story on this phone”.', tags: ['Principle 5 · Private by default', 'HMW #23 · grows over months'] },
-  add: { title: '1 · Add a report', body: 'She can use the sample report, a photo, or just describe what the doctor said. Hinglish is welcome. There’s no account.', tags: ['Principle 7 · Her words', 'Principle 5 · No account'] },
-  read: { title: '2 · Blur, then check', body: 'Personal details are blurred before anything is read. She confirms each item. Weight and BMI are deliberately skipped.', tags: ['Harm #8 · Privacy', 'Principle 2 · No numbers on her body', 'Principle 3 · Three states'] },
-  chapter: { title: '3 · The chapter', body: 'Tara, a peer-style AI guide, connects her symptoms into one loop. The visual is set to her own levels from the report.', tags: ['HMW #1 · One connected story', 'Test A1–A3, A11'] },
-  ask: { title: '4 · Ask anything', body: 'Every answer shows how sure it is. Tricky and unsafe questions from the test set are handled as designed. A test ID tag on each chip links it to the test set.', tags: ['Principle 4 · Honest about certainty', 'Test sets A, B, C'] },
-  done: { title: '5 · Bridge to care', body: 'The chapter ends with questions for her doctor, a teach-back, and an optional message for her mum in English, Hindi or Hinglish.', tags: ['Principle 6 · A bridge, not a replacement', 'HMW #16 + #17'] }
 };

@@ -3,42 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Kahani · PCOD story prototype</title>
-  <meta name="description" content="A private, teen-safe AI guide that turns a PCOD report into a story she understands, one chapter per doctor visit. Clickable prototype.">
-  <meta name="theme-color" content="#efe9ff">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%238b6cf0'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='19' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+  <title>Kahani · Your PCOD story</title>
+  <meta name="description" content="A private, teen-safe guide that turns a PCOD report into a story she understands, one chapter per doctor visit.">
+  <meta name="theme-color" content="#f6f2ff">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%237a5af5'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='19' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div class="stage">
-    <aside class="side">
-      <div class="side-brand"><span class="logo">K</span><div><b>Kahani</b><small>PCOD, explained as her story</small></div></div>
-      <p class="side-lede">A private, teen-safe AI guide for a newly diagnosed Indian teen. She adds her report, and it becomes a chapter of her story. <b>Every doctor visit adds a new chapter.</b></p>
-      <div id="sidenote" class="sidenote" aria-live="polite"></div>
-      <div class="side-how">
-        <p class="sn-k">Try this</p>
-        <ol>
-          <li>Add the sample report to get <b>Chapter 1</b></li>
-          <li>Open the loop, tap the circles, and ask Tara something</li>
-          <li>Try a safety test, like “I hate my body”</li>
-          <li>Finish, go back to your story, then add the <b>June visit</b> to get Chapter 2</li>
-        </ol>
+  <div id="app" class="app">
+    <header class="topbar">
+      <button class="iconbtn" data-act="hide" aria-label="Quick hide">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 4M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.9 9.9 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+      </button>
+      <div class="mid">
+        <div class="brand" id="brand"><span class="logo">K</span>Kahani</div>
+        <div class="prog" id="prog" aria-hidden="true">
+          <div class="prog-track"><i id="progfill"></i></div>
+          <span id="proglabel"></span>
+        </div>
       </div>
-      <div class="side-foot">
-        <button id="resetdemo" class="resetbtn">Reset demo</button>
-        <p>Prototype with scripted demo answers and sample data. Not medical advice.</p>
-      </div>
-    </aside>
-
-    <div class="device">
-      <div class="phone">
-        <div class="notch" aria-hidden="true"></div>
-        <div id="app" class="app"></div>
-      </div>
-    </div>
+      <button class="iconbtn" data-act="sheet" data-arg="privacy" aria-label="What I know about you">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+      </button>
+    </header>
+    <main id="view" class="view"></main>
+    <div id="layer"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
 
   <script src="js/data.js"></script>

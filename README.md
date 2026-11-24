@@ -35,7 +35,7 @@ Then visit http://localhost:8000.
 ## Files
 
 ```
-index.html                    page shell (side notes + phone)
+index.html                    app shell (top bar, view, sheets)
 css/styles.css                all styles
 js/data.js                    sample reports, loop content, test-set answers, mum messages
 js/story.js                   chapters per visit, opt-in save to this phone
