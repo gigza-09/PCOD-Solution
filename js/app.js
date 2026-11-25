@@ -46,9 +46,68 @@
     mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/>',
     bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
     loop: '<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.5h-4.5"/>',
-    body: '<circle cx="12" cy="5" r="2.5"/><path d="M12 8v7M8 10.5h8M9.5 21l2.5-6 2.5 6"/>'
+    body: '<circle cx="12" cy="5" r="2.5"/><path d="M12 8v7M8 10.5h8M9.5 21l2.5-6 2.5 6"/>',
+    mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    speaker: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+    stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>'
   };
   const icon = (n, cls) => `<svg class="ic ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ICONS.info}</svg>`;
+
+  /* ---------- voice: speak instead of typing, and listen instead of reading ----------
+     Speech-to-text uses the browser's recogniser, which in Chrome/Edge sends audio online,
+     so the first use asks first. Read-aloud uses the device's own voices. */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const Voice = {
+    canListen: !!SR,
+    canSpeak: 'speechSynthesis' in window,
+    rec: null, recBtn: null, sayBtn: null,
+    listen(input, btn) {
+      if (this.rec) { this.stopListening(); return; }
+      const rec = new SR();
+      rec.lang = 'en-IN'; rec.interimResults = true; rec.continuous = false;
+      const base = input.value ? input.value.replace(/\s*$/, ' ') : '';
+      rec.onresult = (e) => {
+        let txt = '';
+        for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
+        input.value = base + txt;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      rec.onerror = (e) => { toast(e.error === 'not-allowed' ? 'Microphone is blocked. You can type instead.' : 'Didn’t catch that. Try again?'); };
+      rec.onend = () => { this.rec = null; if (this.recBtn) { this.recBtn.classList.remove('on'); this.recBtn.setAttribute('aria-pressed', 'false'); } this.recBtn = null; input.focus(); };
+      this.rec = rec; this.recBtn = btn;
+      btn.classList.add('on'); btn.setAttribute('aria-pressed', 'true');
+      try { rec.start(); } catch (e) { rec.onend(); }
+    },
+    stopListening() { if (this.rec) this.rec.stop(); },
+    speak(text, lang, btn) {
+      const synth = window.speechSynthesis;
+      const same = this.sayBtn === btn;
+      this.stopSpeaking();
+      if (same) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang || 'en-IN'; u.rate = 0.95;
+      const v = synth.getVoices().find((x) => x.lang === u.lang) || synth.getVoices().find((x) => x.lang.startsWith(u.lang.slice(0, 2)));
+      if (v) u.voice = v;
+      u.onend = u.onerror = () => { if (this.sayBtn === btn) this.stopSpeaking(); };
+      this.sayBtn = btn; btn.classList.add('on'); btn.innerHTML = icon('stop') + '<span>Stop</span>';
+      synth.speak(u);
+    },
+    stopSpeaking() {
+      if (!this.canSpeak) return;
+      window.speechSynthesis.cancel();
+      if (this.sayBtn) { this.sayBtn.classList.remove('on'); this.sayBtn.innerHTML = icon('speaker') + '<span>Listen</span>'; }
+      this.sayBtn = null;
+    }
+  };
+  /* 🎤 next to a text box (only where the browser supports it) */
+  const micBtn = (target) => (Voice.canListen ? `<button type="button" class="mic" data-act="mic" data-arg="${target}" aria-pressed="false" aria-label="Speak instead of typing" title="Speak instead of typing">${icon('mic')}</button>` : '');
+  /* 🔊 Listen: reads the text of the nearest [data-say] block */
+  const sayBtn = () => (Voice.canSpeak ? `<button type="button" class="say-btn" data-act="say" aria-label="Read this aloud">${icon('speaker')}<span>Listen</span></button>` : '');
+  const plainText = (el) => {
+    const c = el.cloneNode(true);
+    c.querySelectorAll('button, .say-btn, .vs, svg, small.src').forEach((n) => n.remove());
+    return c.innerText.replace(/[→↑↓“”]/g, ' ').replace(/\s+/g, ' ').trim();
+  };
 
   /* Literal pictures for each part of the loop */
   const ILLUS = {
@@ -82,6 +141,63 @@
   };
   const illus = (k, cls) => `<svg class="illus ${cls || ''}" viewBox="0 0 64 64" aria-hidden="true">${ILLUS[k] || ''}</svg>`;
 
+  /* Before/after picture scenes: "Usually" vs "With PCOD", one pair per step (viewBox 140×90). */
+  const g = {
+    brain: (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s}) translate(-32 -32)"><path d="M31 17c-3-3-9-3-11 1-5 0-8 5-6 9-4 3-3 9 1 11 0 5 5 8 9 6 2 3 5 3 7 1z" fill="#f7a8c6"/><path d="M33 17c3-3 9-3 11 1 5 0 8 5 6 9 4 3 3 9-1 11 0 5-5 8-9 6-2 3-5 3-7 1z" fill="#f28fb5"/><path d="M32 18v27M21 26c3 0 5 2 5 5M43 26c-3 0-5 2-5 5" stroke="#c4527f" stroke-width="2" fill="none" stroke-linecap="round"/></g>`,
+    ovary: (x, y, rx, ry) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#ffc9a3"/>`,
+    env: (x, y, r) => `<g transform="translate(${x} ${y}) rotate(${r || 0})"><rect x="-8" y="-5.5" width="16" height="11" rx="2" fill="#fff" stroke="#7a5af5" stroke-width="1.5"/><path d="M-7 -4.5L0 1L7 -4.5" fill="none" stroke="#7a5af5" stroke-width="1.5" stroke-linejoin="round"/></g>`,
+    drop: (x, y, s, c) => `<path transform="translate(${x} ${y}) scale(${s || 1})" d="M0 -6c0 0 4.5 5 4.5 8a4.5 4.5 0 0 1-9 0c0-3 4.5-8 4.5-8z" fill="${c || '#ee8a2e'}"/>`,
+    arrow: (x1, x2, y, c) => `<path d="M${x1} ${y}H${x2}" stroke="${c || '#cbbdf7'}" stroke-width="2" stroke-dasharray="3 3"/><path d="M${x2 - 4} ${y - 4}l5 4-5 4" fill="none" stroke="${c || '#cbbdf7'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
+    sac: (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#ee8a2e" stroke-width="1.6"/>`,
+    key: (x, y) => `<g transform="translate(${x} ${y})"><circle r="5" fill="none" stroke="#d9a300" stroke-width="2.6"/><path d="M5 0h12M13 0v4M16.5 0v3" stroke="#d9a300" stroke-width="2.6" stroke-linecap="round"/></g>`,
+    lock: (x, y) => `<g transform="translate(${x} ${y})"><path d="M-3.5 -3v-3a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="#5fb488" stroke-width="2"/><rect x="-6" y="-3" width="12" height="10" rx="2.5" fill="#5fb488"/></g>`,
+    cube: (x, y) => `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="2" fill="#fff" stroke="#d9a300" stroke-width="1.6"/>`
+  };
+  const SCENES = {
+    brain: {
+      usual: g.brain(24, 45, 0.62) + g.arrow(44, 100, 45) + g.env(70, 45) + g.ovary(118, 45, 14, 10),
+      pcod: g.brain(24, 45, 0.62) + g.arrow(44, 100, 45) + g.env(58, 30, -14) + g.env(74, 47, 8) + g.env(88, 30, 16) + g.env(62, 64, -6) + g.env(88, 62, 6) + g.ovary(118, 45, 14, 10) +
+        '<path d="M110 28l-3-5M118 26v-6M126 28l3-5" stroke="#ee8a2e" stroke-width="2" stroke-linecap="round"/>',
+      cap: ['One calm message', 'Too many messages']
+    },
+    ovary: {
+      usual: g.ovary(70, 56, 30, 20) + g.sac(58, 54, 4) + g.sac(74, 60, 4) + g.sac(84, 50, 3.5) + g.drop(62, 24) + g.drop(80, 28, 0.8),
+      pcod: g.ovary(46, 58, 28, 19) + g.sac(36, 56, 4) + g.sac(52, 62, 4) + g.sac(60, 50, 3.5) +
+        g.drop(28, 30) + g.drop(42, 20) + g.drop(56, 30) + g.drop(68, 18, 0.9) + g.drop(36, 8, 0.7) + g.drop(78, 34, 0.8) +
+        g.arrow(80, 96, 50, '#f2b48a') +
+        '<circle cx="118" cy="48" r="15" fill="#f8d3b8"/><circle cx="113" cy="45" r="1.7" fill="#2b1f2e"/><circle cx="123" cy="45" r="1.7" fill="#2b1f2e"/>' +
+        '<path d="M114 52q4 3 8 0" stroke="#b4545f" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="109" cy="52" r="2" fill="#e8768a"/><circle cx="127" cy="50" r="2" fill="#e8768a"/>' +
+        '<path d="M114 61l-1 4M118 62v4M122 61l1 4" stroke="#3a2a30" stroke-width="1.3" stroke-linecap="round"/>',
+      cap: ['A little hormone', 'Extra: pimples, hair']
+    },
+    follicle: {
+      usual: g.ovary(58, 50, 34, 24) + g.sac(40, 44, 4) + g.sac(44, 60, 4) + g.sac(58, 66, 3.5) + g.sac(66, 46, 12) +
+        '<path d="M78 40Q94 28 106 32" stroke="#f2b48a" stroke-width="2" stroke-dasharray="3 3" fill="none"/>' +
+        '<circle cx="116" cy="32" r="7" fill="#ffd96a" stroke="#e2a400" stroke-width="1.6"/><path d="M110 22l-3-4M116 20v-5M122 22l3-4" stroke="#e2a400" stroke-width="1.8" stroke-linecap="round"/>',
+      pcod: g.ovary(70, 46, 40, 28) + [[40, 44], [48, 28], [64, 22], [82, 24], [97, 34], [100, 54], [86, 66], [66, 70], [48, 62]].map(([x, y]) => g.sac(x, y, 5.5)).join('') +
+        '<circle cx="70" cy="46" r="9" fill="#ee8a2e"/><path d="M67 42v8M73 42v8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>',
+      cap: ['One egg is let go', 'Sacs pause, no egg']
+    },
+    period: {
+      usual: '<path d="M10 46H130" stroke="#efe6ea" stroke-width="8" stroke-linecap="round"/>' + g.drop(40, 28, 1.5, '#d33a54') + g.drop(100, 28, 1.5, '#d33a54') +
+        '<circle cx="40" cy="46" r="4" fill="#d33a54"/><circle cx="100" cy="46" r="4" fill="#d33a54"/><path d="M40 60v5H100v-5" stroke="#b9b1c9" stroke-width="1.6" fill="none"/>',
+      pcod: '<path d="M10 46H130" stroke="#efe6ea" stroke-width="8" stroke-linecap="round"/>' + g.drop(18, 28, 1.5, '#d33a54') + g.drop(124, 28, 1.5, '#d33a54') +
+        '<circle cx="18" cy="46" r="4" fill="#d33a54"/><circle cx="124" cy="46" r="4" fill="#d33a54"/>' +
+        '<circle cx="70" cy="32" r="8" fill="none" stroke="#d33a54" stroke-width="1.5" stroke-dasharray="2.5 2.2"/><text x="70" y="36" font-size="11" font-weight="800" text-anchor="middle" fill="#d33a54" font-family="Nunito, sans-serif">?</text>' +
+        '<path d="M18 60v5H124v-5" stroke="#b9b1c9" stroke-width="1.6" fill="none"/>',
+      cap: ['About once a month', 'Comes late']
+    },
+    insulin: {
+      usual: '<circle cx="98" cy="45" r="26" fill="#e3f6ea" stroke="#a5dcbf" stroke-width="2"/>' + g.lock(72, 45) + g.key(34, 45) + g.arrow(54, 64, 45, '#e9c868') +
+        g.cube(94, 36) + g.cube(106, 50) + g.cube(92, 56),
+      pcod: '<circle cx="100" cy="45" r="26" fill="#e3f6ea" stroke="#a5dcbf" stroke-width="2"/>' + g.lock(74, 45) +
+        g.key(16, 22) + g.key(16, 45) + g.key(16, 68) + g.cube(52, 26) + g.cube(56, 64) + g.cube(46, 46) +
+        '<text x="100" y="50" font-size="12" font-weight="800" text-anchor="middle" fill="#a5dcbf" font-family="Nunito, sans-serif">…</text>',
+      cap: ['Key lets sugar in', 'Body makes extra keys']
+    }
+  };
+  const scene = (k, which) => `<svg viewBox="0 0 140 90" aria-hidden="true">${SCENES[k][which]}</svg>`;
+
   /* Tara — original illustrated peer guide (she blinks) */
   function tara(size, mood) {
     const mouth = mood === 'care'
@@ -109,7 +225,7 @@
   const fresh = () => ({
     screen: 'home', report: null, source: null, phase: 'scan', rejected: {}, status: null,
     chIndex: null, card: 0, loopMode: 'mine', chat: [], ctx: null, group: 'A',
-    paused: false, mumLang: 'en', teachFb: null, typing: false,
+    paused: false, mumLang: 'en', teachFb: null, typing: false, voiceOk: false, voicePending: null,
     hidden: false, sheet: null, sheetAnim: false, anim: null
   });
   let st = fresh();
@@ -129,11 +245,11 @@
   };
 
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, ms) {
     if (st.hidden) return;
     const t = $('#toast');
     t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms || 2000);
   }
 
   /* ---------- top bar (persistent, so the progress bar animates) ---------- */
@@ -168,7 +284,12 @@
     return `<section class="scr home">
       <div class="scene" aria-hidden="true">${sceneSvg()}</div>
       <h1 class="h-xl">Your story</h1>
-      <div class="guide">${tara(96)}<p class="bubble">${bubble}</p></div>
+      <div class="guide">${tara(96)}<p class="bubble" data-say>${bubble} ${sayBtn()}</p></div>
+      ${chs.length ? '' : `<ol class="howto" aria-label="How it works">
+        <li>${icon('doc')}<span>Add</span></li>
+        <li>${icon('check')}<span>Check</span></li>
+        <li>${icon('body')}<span>Learn your body</span></li>
+      </ol>`}
       <ol class="path">
         ${nodes}
         <li class="pnode ${chs.length % 2 ? 'r' : 'l'}" style="--d:${chs.length * 70}ms">
@@ -229,7 +350,7 @@
           </button>
           <div class="expand"><div>
             <label class="sr" for="tellbox">What did the doctor say?</label>
-            <textarea id="tellbox" rows="3" placeholder="Doctor ne bola probably PCOD hai, periods irregular hain…"></textarea>
+            <div class="field"><textarea id="tellbox" rows="3" placeholder="Type or tap the mic: “Doctor ne bola probably PCOD hai…”"></textarea>${micBtn('tellbox')}</div>
             <button class="btn sm" data-act="tell">Explain this ${icon('right')}</button>
           </div></div>
         </div>
@@ -289,27 +410,28 @@
     const n = S.chapters.length + 1;
     return `<section class="scr read">
       <h1 class="h-l">Is this right?</h1>
-      <p class="sub">Tap anything that’s wrong.</p>
       <div class="safe-row">
         ${r.paper ? `<button class="chip t-mint" data-act="sheet" data-arg="paper">${icon('lock')} Details hidden</button>` : ''}
         ${(r.paper || r.weightSkipped) ? `<span class="chip t-pink">${icon('heart')} Weight skipped</span>` : ''}
       </div>
+      <div class="statusbox">
+        <h2 class="qlabel">What did your doctor say?</h2>
+        <div class="seg tri" role="radiogroup" aria-label="What did your doctor say?">
+          ${['risk', 'diagnosed', 'unsure'].map((k) => `<button role="radio" aria-checked="${st.status === k}" class="${st.status === k ? 'on' : ''}" data-act="status" data-arg="${k}">${K.statusInfo[k].ask}</button>`).join('')}
+        </div>
+        <p class="tip" id="statustip">${esc(K.statusInfo[st.status].tip)}</p>
+      </div>
+      <h2 class="qlabel">What I found <span>Tap “Not right?” if something’s wrong</span></h2>
       <ul class="items">
         ${r.items.map((it, k) => {
           const no = !!st.rejected[it.id];
           return `<li class="item ${no ? 'no' : ''}" style="--d:${k * 40}ms" data-item="${it.id}">
             <span class="item-ic">${icon(it.icon)}</span>
-            <p>${esc(it.plain)}</p>
-            <button class="tick" data-act="tick" data-arg="${it.id}" aria-pressed="${!no}" aria-label="${no ? 'Marked wrong. Tap to restore' : 'Correct. Tap if wrong'}">${icon('check', 'i-yes')}${icon('x', 'i-no')}</button>
+            <p>${esc(it.friendly || it.plain)}</p>
+            <button class="wrong" data-act="tick" data-arg="${it.id}" aria-pressed="${no}">${no ? 'Undo' : 'Not right?'}</button>
           </li>`;
         }).join('')}
       </ul>
-      <div class="statusbox">
-        <div class="seg tri" role="radiogroup" aria-label="Where things stand">
-          ${['risk', 'diagnosed', 'unsure'].map((k) => `<button role="radio" aria-checked="${st.status === k}" class="${st.status === k ? 'on' : ''}" data-act="status" data-arg="${k}">${K.statusInfo[k].short}</button>`).join('')}
-        </div>
-        <p class="tip" id="statustip">${esc(K.statusInfo[st.status].tip)}</p>
-      </div>
       <div class="cta"><button class="btn block" data-act="startch">Start Chapter ${n} ${icon('right')}</button></div>
     </section>`;
   }
@@ -324,7 +446,7 @@
 
   /* The loop, drawn as a picture story: Brain → Ovaries → Egg sacs → Period → repeat, with insulin as a booster. */
   const CHAIN = ['brain', 'ovary', 'follicle', 'period'];
-  const LINKS = { brain: 'loud signal', ovary: 'extra androgens', follicle: 'no egg released' };
+  const LINKS = { brain: 'so', ovary: 'so', follicle: 'so' };
 
   function loopData(c, mode) {
     if (!c) return { lv: K.typicalLevels, pins: {} };
@@ -336,18 +458,32 @@
     return { lv, pins };
   }
   function meter(k, l) {
-    return `<span class="lvl l${l}"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${K.loopNodes[k].levels[l - 1]}</span>`;
+    return `<span class="lvl" title="How busy this part is for you"><span class="dots3" aria-hidden="true">${[1, 2, 3].map((n) => `<i class="${n <= l ? 'on' : ''}"></i>`).join('')}</span>${K.loopNodes[k].levels[l - 1]}</span>`;
   }
   function stepHtml(k, lv, pins, i, personal) {
     const N = K.loopNodes[k];
     const mine = pins[k] || [];
-    return `<li class="step n-${k}" style="--d:${i * 70}ms">
-      ${illus(k)}
-      <div class="step-t">
-        <div class="step-h"><b>${N.name}</b>${personal ? meter(k, lv[k] || 2) : ''}</div>
-        <p>${N.what}</p>
-        ${mine.length ? `<div class="pins"><small>You</small>${mine.map((x) => `<span class="chip">${esc(x.tag || x.plain)}</span>`).join('')}</div>` : ''}
+    const S2 = SCENES[k];
+    const strip = (h) => h.replace(/<[^>]+>/g, '');
+    const spoken = `${N.name}. ${strip(N.short)} ${mine.length ? 'From your report: ' + mine.map((x) => x.friendly || x.plain).join('. ') + '.' : ''} What helps: ${N.helps}`;
+    return `<li class="step n-${k}" style="--d:${i * 70}ms" data-say="${esc(spoken)}">
+      <div class="step-top">
+        <b class="step-name">${N.name}</b>
+        ${personal ? meter(k, lv[k] || 2) : ''}
+        ${sayBtn()}
       </div>
+      <div class="vs" role="img" aria-label="Usually: ${S2.cap[0]}. With PCOD: ${S2.cap[1]}.">
+        <figure class="vs-a"><figcaption class="vs-t">Usually</figcaption>${scene(k, 'usual')}<span>${S2.cap[0]}</span></figure>
+        <figure class="vs-b"><figcaption class="vs-t">With PCOD</figcaption>${scene(k, 'pcod')}<span>${S2.cap[1]}</span></figure>
+      </div>
+      ${mine.length ? `<div class="yours"><small>You</small><ul>${mine.map((x) => `<li>${esc(x.friendly || x.plain)}</li>`).join('')}</ul></div>` : ''}
+      <button class="step-more" data-act="stepmore" aria-expanded="false">Explain more ${icon('down')}</button>
+      <div class="expand"><div class="step-x">
+        <p>${N.short}</p>
+        <p><b>How it normally works</b>${N.normal}</p>
+        <p class="helps"><b>What helps</b>${N.helps}</p>
+        <p class="word">Doctor’s word: <i>${N.word}</i></p>
+      </div></div>
     </li>`;
   }
   function loopViz(c) {
@@ -361,12 +497,13 @@
       ${p ? `<div class="seg" role="tablist" aria-label="Compare visits">${[['then', esc(p.visitLabel)], ['mine', esc(c.visitLabel)]].map(([k, l]) => `<button role="tab" aria-selected="${mode === k}" class="${mode === k ? 'on' : ''}" data-act="loopmode" data-arg="${k}">${l}</button>`).join('')}</div>` : ''}
       <ol class="chain">
         ${chain}
-        <li class="repeat">${icon('loop')}<span>No egg means no “slow down” message to the brain, so <b>the loop repeats</b>.</span></li>
+        <li class="repeat">${icon('loop')}<span>Without an egg, your brain doesn’t get the “all done” message, so it keeps sending. <b>That’s the loop.</b></span></li>
       </ol>
       <div class="boost">
-        <span class="boost-tag">${icon('bolt')} Booster</span>
+        <span class="boost-tag">${icon('plus')} Also part of it</span>
         <ul class="chain">${stepHtml('insulin', lv, pins, 5, personal)}</ul>
       </div>
+      <p class="calm">${icon('heart')}<span>This is <b>very common</b> and can be managed well. Nothing here is your fault.</span></p>
     </div>`;
   }
   function patchLoop() {
@@ -391,14 +528,14 @@
       </div>
       <p class="note">${icon('bulb')} No real cysts, just <b>paused egg sacs</b>.</p>`;
     } else if (key === 'loop') {
-      say = p ? 'Switch between visits and <b>watch what changed</b>.' : 'Here’s what’s going on, <b>step by step</b>. Your signs are on each step.';
+      say = p ? 'Switch between visits and <b>see what changed</b>.' : 'Here’s what’s happening in your body, <b>in plain words</b>. Read at your own pace.';
       body = loopViz(c);
     } else if (key === 'fault') {
       say = 'The most important part:';
       body = `<div class="bigmsg">${icon('heart')}<b>You didn’t cause this.</b><p>Genes plus environment. Not your food, not stress, not your mum.</p></div>`;
     } else if (key === 'changed') {
       const ps = K.statusInfo[p.status];
-      const rows = [['cycle', 'period', 'Period gap'], ['lh', 'brain', 'Brain signal'], ['testo', 'ovary', 'Testosterone'], ['insulin', 'insulin', 'Insulin']]
+      const rows = [['cycle', 'period', 'Period gap'], ['lh', 'brain', 'Brain messages'], ['testo', 'ovary', 'Skin-and-hair hormone'], ['insulin', 'insulin', 'Insulin']]
         .filter(([k]) => p.facts[k] && c.facts[k])
         .map(([k, n, l], i) => `<li style="--d:${i * 60}ms">${illus(n, 'sm')}<span class="d-l">${l}</span><span class="d-v"><span class="was">${esc(p.facts[k])}</span>${icon('right')}<span class="now">${esc(c.facts[k])}</span></span></li>`).join('');
       say = `Welcome back! ${c.improved ? 'Since your ' + esc(p.visitLabel) + ', your loop got <b>quieter</b>.' : 'Here’s your new report next to your ' + esc(p.visitLabel) + '.'}`;
@@ -417,7 +554,7 @@
     }
     const last = st.card === cards.length - 1;
     return `<div class="card" data-key="${key}">
-        <div class="say">${tara(52)}<p class="bubble">${say}</p></div>
+        <div class="say">${tara(52)}<p class="bubble" data-say>${say} ${sayBtn()}</p></div>
         ${body}
       </div>
       <div class="cta row3">
@@ -452,7 +589,7 @@
     if (cardsFor(c)[to] === 'loop') st.loopMode = 'mine';
     const slot = $('#cardslot');
     slot.innerHTML = cardHtml(c);
-    $('.card', slot).classList.add('enter', delta > 0 ? 'fwd' : 'back');
+    $('.card', slot).classList.add('enter', delta > 0 ? 'fwd' : 'rev');
     $$('.dots span').forEach((d, i) => { d.className = i === to ? 'on' : i < to ? 'past' : ''; });
     $('#view').scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -488,11 +625,12 @@
     const ci = K.certInfo[m.cert] || K.certInfo.none;
     const parts = String(m.text).split('<br><br>');
     const first = parts[0]; const rest = parts.slice(1).join('<br><br>');
-    return `<li class="msg tara ${m.kind} ${m.open ? 'open' : ''}" data-i="${i}">
+    return `<li class="msg tara ${m.kind} ${m.open ? 'open' : ''}" data-i="${i}" data-say>
       <span class="badge ${ci.cls}">${m.kind === 'urgent' ? icon('info') : m.cert === 'doctor' ? icon('shield') : icon('star')}${esc(m.certLabel || ci.label)}</span>
       <p>${first}</p>
       <div class="expand ${m.open ? 'open' : ''}"><div>${rest ? `<p>${rest}</p>` : ''}${m.src ? `<small class="src">Source: ${esc(m.src)}</small>` : ''}</div></div>
       <div class="m-acts">
+        ${sayBtn()}
         <button class="mini ghost more" data-act="more" data-arg="${i}">${m.open ? 'Less' : (rest ? 'Tell me more' : 'Source')}</button>
         ${m.doctorQ ? `<button class="mini ${m.added ? 'done' : ''}" data-act="addq" data-arg="${i}" ${m.added ? 'disabled' : ''}>${m.added ? icon('check') + ' Added' : icon('plus') + ' Doctor list'}</button>` : ''}
         <button class="mini ghost flag ${m.flagged ? 'done' : ''}" data-act="flag" data-arg="${i}" aria-label="This seems wrong" ${m.flagged ? 'disabled' : ''}>${icon('flag')}${m.flagged ? ' Flagged' : ''}</button>
@@ -519,14 +657,14 @@
         <button class="btn xs" data-act="finish">Finish ${icon('star')}</button>
       </div>` : '<h1 class="h-l">Ask Tara</h1>'}
       <ul class="chatlog" id="chatlog" aria-live="polite">
-        <li class="msg intro"><div class="say">${tara(44)}<p class="bubble">Ask me anything, even the awkward stuff. I’ll always say <b>how sure I am</b>.</p></div></li>
+        <li class="msg intro"><div class="say">${tara(44)}<p class="bubble">Ask me anything, even the awkward stuff. Type it or say it. I’ll always tell you <b>how sure I am</b>.</p></div></li>
         ${st.chat.map(msgHtml).join('')}
       </ul>
       <div class="asktools">
         <div class="chips" id="chips">${chipsHtml()}</div>
         <form class="composer" data-act="askform">
           <label class="sr" for="askbox">Your question</label>
-          <input id="askbox" autocomplete="off" placeholder="Type anything…">
+          <div class="field"><input id="askbox" autocomplete="off" placeholder="Type or tap the mic…">${micBtn('askbox')}</div>
           <button class="send" aria-label="Send">${icon('send')}</button>
         </form>
       </div>
@@ -604,7 +742,7 @@
 
   /* ---------- tab: DOCTOR ---------- */
   function qlistHtml(c) {
-    return `<ul class="qlist">${c.doctorQs.map((q, i) => `<li><label><input type="checkbox" data-act="qtoggle" data-arg="${i}" ${q.skip ? '' : 'checked'}><span>${esc(q.text)}${q.from === 'chat' ? '<small>You asked</small>' : q.from === 'carried' ? '<small>From last time</small>' : ''}</span></label></li>`).join('')}</ul>`;
+    return `<ul class="qlist">${c.doctorQs.map((q, i) => `<li><label><input type="checkbox" data-act="qtoggle" data-arg="${i}" ${q.skip ? '' : 'checked'}><span>${esc(q.text)}${q.from === 'chat' ? '<small>You asked</small>' : q.from === 'own' ? '<small>Your question</small>' : q.from === 'carried' ? '<small>From last time</small>' : ''}</span></label></li>`).join('')}</ul>`;
   }
   function doctorScreen() {
     const c = S.last();
@@ -619,6 +757,13 @@
       <h1 class="h-l">For your doctor</h1>
       <p class="sub">Tick the ones you want to ask at your next visit.</p>
       ${qlistHtml(c)}
+      <form class="ownq" data-act="ownform">
+        <label class="qlabel" for="ownbox">Add my own question</label>
+        <div class="composer">
+          <div class="field"><input id="ownbox" autocomplete="off" placeholder="Type or tap the mic…">${micBtn('ownbox')}</div>
+          <button class="send" aria-label="Add question">${icon('plus')}</button>
+        </div>
+      </form>
       <div class="cta"><div class="row2"><button class="btn ghost" data-act="copyqs">${icon('copy')} Copy</button><button class="btn" data-act="dlqs">${icon('download')} Save</button></div></div>
     </section>`;
   }
@@ -633,6 +778,7 @@
           ${lc ? `<div class="pins">${lc.items.map((i) => `<span class="chip">${esc(i.tag || i.plain)}</span>`).join('')}</div>` : '<p class="hint">Nothing yet.</p>'}
           <p class="hint"><b>I don’t know</b> your name, phone, school or weight.</p>
           <p class="hint"><b>Saved:</b> ${S.keep ? `${S.chapters.length} chapter(s), on this phone only.` : 'nothing.'}</p>
+          ${Voice.canListen ? '<p class="hint"><b>Voice typing:</b> your browser turns speech into text, and may use an online service to do it. Typing never leaves this phone.</p>' : ''}
           <button class="btn block danger" data-act="wipe">Delete everything</button>`;
       }
       case 'paper':
@@ -643,17 +789,22 @@
           <div class="seg sm" role="tablist">${Object.keys(groups).map((g) => `<button role="tab" aria-selected="${st.group === g}" class="${st.group === g ? 'on' : ''}" data-act="group" data-arg="${g}">${groups[g]}</button>`).join('')}</div>
           <div class="qgrid" id="qgrid">${qgrid()}</div>`;
       }
+      case 'voice':
+        return `<h2 class="h-m">${icon('mic')} Before you speak</h2>
+          <p class="hint">Your browser turns your voice into text. To do that it may send the audio to its online speech service (Google or Microsoft).</p>
+          <p class="hint">Anything you <b>type</b> stays on this phone. Don’t say names or phone numbers out loud.</p>
+          <div class="row2"><button class="btn sm ghost" data-act="voiceno">Type instead</button><button class="btn sm" data-act="voiceok">${icon('mic')} Use my voice</button></div>`;
       case 'teach':
         return `<h2 class="h-m">${icon('bulb')} Explain it back</h2>
           <p class="hint">In one line, how would you explain your loop to a friend?</p>
-          <div class="teach"><label class="sr" for="teachbox">Your explanation</label><input id="teachbox" value="${esc(c.teach)}" placeholder="My brain signal is loud, so…"><button class="btn sm" data-act="teach">Check</button></div>
+          <div class="teach"><label class="sr" for="teachbox">Your explanation</label><div class="field"><input id="teachbox" value="${esc(c.teach)}" placeholder="Type or say it…">${micBtn('teachbox')}</div><button class="btn sm" data-act="teach">Check</button></div>
           <div class="expand ${st.teachFb ? 'open' : ''}" id="teachwrap"><div><p class="teachfb" id="teachfb">${st.teachFb || ''}</p></div></div>`;
       case 'mum':
         return `<h2 class="h-m">${icon('mail')} A message for Mum</h2>
-          <p class="hint">Only if you want to. You can edit it before sending.</p>
+          <p class="hint">Only if you want to. Copy it, then change anything before you send it. Or play it out loud to her.</p>
           <div class="seg sm" role="tablist" aria-label="Language">${[['en', 'English'], ['hi', 'हिंदी'], ['hl', 'Hinglish']].map(([k, l]) => `<button role="tab" aria-selected="${st.mumLang === k}" class="${st.mumLang === k ? 'on' : ''}" data-act="mumlang" data-arg="${k}">${l}</button>`).join('')}</div>
-          <div class="letter" id="letter" lang="${st.mumLang === 'hi' ? 'hi' : 'en'}">${esc(mumText(c, st.mumLang))}</div>
-          <button class="btn sm block" data-act="copymum">${icon('copy')} Copy message</button>`;
+          <div class="letter" id="letter" lang="${st.mumLang === 'hi' ? 'hi' : 'en'}" data-say data-lang="${st.mumLang === 'hi' ? 'hi-IN' : 'en-IN'}">${esc(mumText(c, st.mumLang))}</div>
+          <div class="row2"><button class="btn sm ghost" data-act="saymum">${icon('speaker')} Play aloud</button><button class="btn sm" data-act="copymum">${icon('copy')} Copy</button></div>`;
       default: return '';
     }
   }
@@ -679,15 +830,17 @@
   async function closeSheet() {
     const sh = $('.sheet'); const sc = $('.scrim');
     if (sh) { sh.classList.add('out'); sc && sc.classList.add('out'); await wait(220); }
+    if (sh && sh.contains(Voice.sayBtn)) Voice.stopSpeaking();
     st.sheet = null; renderLayer();
   }
 
   /* ---------- render ---------- */
   const VIEWS = { home, body: bodyScreen, ask: askScreen, doctor: doctorScreen, add, read, chapter: chapterScreen, done: doneScreen };
   function render() {
+    Voice.stopSpeaking(); Voice.stopListening();
     const view = $('#view');
     const changed = st.screen !== lastScreen;
-    const dir = ORDER.indexOf(st.screen) >= ORDER.indexOf(lastScreen) ? 'fwd' : 'back';
+    const dir = ORDER.indexOf(st.screen) >= ORDER.indexOf(lastScreen) ? 'fwd' : 'rev';
     const keep = view.scrollTop;
     $('#app').classList.toggle('on-home', st.screen === 'home');
     updateTop();
@@ -729,10 +882,39 @@
   }
   const qText = (c) => 'Questions for my doctor\n\n' + c.doctorQs.filter((q) => !q.skip).map((q, i) => `${i + 1}. ${q.text}`).join('\n');
 
+  /* After the voice notice: go back to where she was, then start listening (or just focus the box). */
+  async function voiceBack(listen) {
+    const p = st.voicePending; st.voicePending = null;
+    if (!p) { await closeSheet(); return; }
+    if (p.sheet) openSheet(p.sheet); else await closeSheet();
+    const inp = $('#' + p.target); if (!inp) return;
+    inp.value = p.value;
+    if (listen) Voice.listen(inp, $('.mic', inp.parentNode)); else inp.focus();
+  }
+
   const acts = {
     go: (a) => { if (a === 'chapter') st.ctx = null; go(a); },
     tab: (a) => { if (a === st.screen) { $('#view').scrollTo({ top: 0, behavior: 'smooth' }); return; } Object.assign(st, { chIndex: null, ctx: null, loopMode: 'mine', anim: 'fade' }); go(a); },
-    hide: () => { st.hidden = true; $('#toast').classList.remove('show'); renderLayer(); },
+    hide: () => { Voice.stopSpeaking(); Voice.stopListening(); st.hidden = true; $('#toast').classList.remove('show'); renderLayer(); },
+    /* voice */
+    say: (a, el) => {
+      const box = el.closest('[data-say]'); if (!box) return;
+      const text = box.dataset.say || plainText(box);
+      Voice.speak(text, box.dataset.lang, el);
+    },
+    saymum: (a, el) => {
+      const L = $('#letter'); const same = Voice.sayBtn === el;
+      Voice.stopSpeaking(); if (same) return;
+      Voice.speak(L.textContent, L.dataset.lang, el);
+      el.innerHTML = icon('stop') + ' Stop';
+    },
+    mic: (a, el) => {
+      const inp = $('#' + a); if (!inp) return;
+      if (!st.voiceOk) { st.voicePending = { target: a, sheet: st.sheet, value: inp.value }; openSheet('voice'); return; }
+      Voice.listen(inp, el);
+    },
+    voiceok: async () => { st.voiceOk = true; await voiceBack(true); },
+    voiceno: async () => { await voiceBack(false); },
     unhide: () => { st.hidden = false; renderLayer(); },
     sheet: (a) => openSheet(a),
     closesheet: () => closeSheet(),
@@ -752,8 +934,9 @@
       st.rejected[a] = !st.rejected[a];
       const no = st.rejected[a];
       el.closest('.item').classList.toggle('no', no);
-      el.setAttribute('aria-pressed', !no);
-      el.setAttribute('aria-label', no ? 'Marked wrong. Tap to restore' : 'Correct. Tap if wrong');
+      el.setAttribute('aria-pressed', no);
+      el.textContent = no ? 'Undo' : 'Not right?';
+      if (no) toast('Okay, I’ll leave that out');
     },
     status: (a) => {
       st.status = a;
@@ -764,6 +947,12 @@
     next: () => goCard(1),
     prev: () => goCard(-1),
     loopmode: (a) => { st.loopMode = a; patchLoop(); },
+    stepmore: (a, el) => {
+      const step = el.closest('.step'); const open = !step.classList.contains('open');
+      step.classList.toggle('open', open); $('.expand', step).classList.toggle('open', open);
+      el.setAttribute('aria-expanded', open);
+      el.firstChild.textContent = open ? 'Show less ' : 'Explain more ';
+    },
     carry: (a, el) => {
       const [i, v] = a.split(':'); const p = prevChapter(); const c = chapter();
       const q = p.doctorQs.filter((x) => !x.skip)[+i];
@@ -826,7 +1015,16 @@
       $$('.keep-s').forEach((s) => { s.textContent = el.checked ? 'On · no name, no account' : 'Off · gone when you close this'; });
       toast(el.checked ? 'Saved on this phone only' : 'Not saved');
     },
-    wipe: async () => { if (st.sheet) await closeSheet(); S.clearAll(); st = fresh(); lastScreen = null; render(); toast('Everything cleared'); }
+    wipe: async (a, el) => {
+      /* two taps: the first one arms it, so nothing is lost by accident */
+      if (!el.dataset.armed) {
+        el.dataset.armed = '1'; el.dataset.label = el.textContent; el.classList.add('armed');
+        el.textContent = 'Tap again to delete everything';
+        setTimeout(() => { if (el.isConnected) { delete el.dataset.armed; el.classList.remove('armed'); el.textContent = el.dataset.label; } }, 4000);
+        return;
+      }
+      if (st.sheet) await closeSheet(); S.clearAll(); st = fresh(); lastScreen = null; render(); toast('Everything cleared');
+    }
   };
 
   document.addEventListener('click', (e) => {
@@ -843,9 +1041,18 @@
     if (f) f(el.dataset.arg, el);
   });
   document.addEventListener('submit', (e) => {
+    if (e.target.closest('[data-act="ownform"]')) {
+      e.preventDefault();
+      const inp = $('#ownbox'); const q = inp.value.trim(); const c = S.last();
+      if (!q) { toast('Type or say your question first'); return; }
+      if (c && !c.doctorQs.some((x) => x.text === q)) { c.doctorQs.push({ text: q, from: 'own' }); S.persist(); }
+      Voice.stopListening(); render(); toast('Added to your list');
+      return;
+    }
     const f = e.target.closest('[data-act="askform"]');
     if (!f) return;
     e.preventDefault();
+    Voice.stopListening();
     const inp = $('#askbox'); const q = inp.value.trim();
     if (q && !st.typing) { inp.value = ''; ask(q); }
   });

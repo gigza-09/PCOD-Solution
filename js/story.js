@@ -43,7 +43,7 @@
         status: ch.status,
         levels: ch.levels,
         facts: ch.facts || {},
-        items: (ch.items || []).map((i) => ({ id: i.id, plain: i.plain, tag: i.tag || i.plain, icon: i.icon, node: i.node })),
+        items: (ch.items || []).map((i) => ({ id: i.id, plain: i.plain, tag: i.tag || i.plain, friendly: i.friendly || i.plain, icon: i.icon, node: i.node })),
         improved: !!ch.improved,
         doctorQs: (ch.doctorQs || []).map((q) => ({ text: q, done: false, from: 'report' })),
         teach: '',

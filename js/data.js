@@ -34,14 +34,21 @@ KAHANI.reports = {
     },
     status: 'risk',
     items: [
-      { id: 'cycle', icon: 'calendar', plain: 'Periods every 45–60 days', tag: 'Every 45–60 days', node: 'period' },
-      { id: 'acne', icon: 'spark', plain: 'Acne along your jaw', tag: 'Jaw acne', node: 'ovary' },
-      { id: 'hair', icon: 'leaf', plain: 'Some hair on chin and upper lip', tag: 'Chin hair', node: 'ovary' },
-      { id: 'lh', icon: 'signal', plain: 'Brain’s “grow” signal (LH) is loud', tag: 'LH loud', node: 'brain' },
-      { id: 'testo', icon: 'drop', plain: 'Testosterone a little high', tag: 'Testosterone ↑', node: 'ovary' },
-      { id: 'insulin', icon: 'bolt', plain: 'Insulin at the upper end', tag: 'Insulin ↑', node: 'insulin' },
+      { id: 'cycle', icon: 'calendar', plain: 'Periods every 45–60 days', tag: 'Every 45–60 days', node: 'period',
+        friendly: 'Your period comes every 45–60 days' },
+      { id: 'acne', icon: 'spark', plain: 'Acne along your jaw', tag: 'Jaw acne', node: 'ovary',
+        friendly: 'Some pimples along your jaw' },
+      { id: 'hair', icon: 'leaf', plain: 'Some hair on chin and upper lip', tag: 'Chin hair', node: 'ovary',
+        friendly: 'A few hairs on your chin and upper lip' },
+      { id: 'lh', icon: 'signal', plain: 'Brain’s “grow” signal (LH) is loud', tag: 'LH loud', node: 'brain',
+        friendly: 'Your brain is sending extra “get an egg ready” messages' },
+      { id: 'testo', icon: 'drop', plain: 'Testosterone a little high', tag: 'Testosterone ↑', node: 'ovary',
+        friendly: 'A little more of the skin-and-hair hormone than usual' },
+      { id: 'insulin', icon: 'bolt', plain: 'Insulin at the upper end', tag: 'Insulin ↑', node: 'insulin',
+        friendly: 'Your insulin is at the higher end, but still in the normal range' },
       { id: 'ruled', icon: 'check', plain: 'Thyroid and prolactin are normal', tag: 'Thyroid normal', node: null },
-      { id: 'scan', icon: 'info', plain: 'Scan note (scans don’t diagnose teens)', tag: 'Scan: paused sacs', node: 'follicle' },
+      { id: 'scan', icon: 'info', plain: 'Scan note (scans don’t diagnose teens)', tag: 'Scan: paused sacs', node: 'follicle',
+        friendly: 'Your scan shows paused egg sacs (common in teens)' },
       { id: 'note', icon: 'pen', plain: 'Doctor: “probable PCOD”, re-check in 3 months', tag: 'Probable PCOD', node: null }
     ],
     levels: { brain: 3, ovary: 2, follicle: 3, period: 3, insulin: 2 },
@@ -79,12 +86,18 @@ KAHANI.reports = {
     },
     status: 'diagnosed',
     items: [
-      { id: 'cycle', icon: 'calendar', plain: 'Periods every 32–38 days', tag: 'Every 32–38 days', node: 'period' },
-      { id: 'acne', icon: 'spark', plain: 'Acne is better', tag: 'Acne better', node: 'ovary' },
-      { id: 'hair', icon: 'leaf', plain: 'Chin and lip hair about the same', tag: 'Chin hair same', node: 'ovary' },
-      { id: 'lh', icon: 'signal', plain: 'LH signal is calmer', tag: 'LH calmer', node: 'brain' },
-      { id: 'testo', icon: 'drop', plain: 'Testosterone back in range', tag: 'Testosterone OK', node: 'ovary' },
-      { id: 'insulin', icon: 'bolt', plain: 'Insulin came down a bit', tag: 'Insulin ↓', node: 'insulin' },
+      { id: 'cycle', icon: 'calendar', plain: 'Periods every 32–38 days', tag: 'Every 32–38 days', node: 'period',
+        friendly: 'Your period now comes every 32–38 days' },
+      { id: 'acne', icon: 'spark', plain: 'Acne is better', tag: 'Acne better', node: 'ovary',
+        friendly: 'Your pimples are better' },
+      { id: 'hair', icon: 'leaf', plain: 'Chin and lip hair about the same', tag: 'Chin hair same', node: 'ovary',
+        friendly: 'Chin and lip hair about the same' },
+      { id: 'lh', icon: 'signal', plain: 'LH signal is calmer', tag: 'LH calmer', node: 'brain',
+        friendly: 'Your brain’s messages have calmed down' },
+      { id: 'testo', icon: 'drop', plain: 'Testosterone back in range', tag: 'Testosterone OK', node: 'ovary',
+        friendly: 'The skin-and-hair hormone is back in the normal range' },
+      { id: 'insulin', icon: 'bolt', plain: 'Insulin came down a bit', tag: 'Insulin ↓', node: 'insulin',
+        friendly: 'Your insulin came down a little' },
       { id: 'treat', icon: 'pill', plain: 'On your doctor’s treatment', tag: 'On treatment', node: null },
       { id: 'note', icon: 'pen', plain: 'Doctor: “PCOS confirmed”, review in 6 months', tag: 'Confirmed', node: null }
     ],
@@ -101,27 +114,49 @@ KAHANI.reports = {
 };
 
 KAHANI.statusInfo = {
-  risk: { label: 'At risk · doctor will re-check', short: 'At risk', tone: 'amber', tip: 'Your doctor will re-check. That’s a plan, not limbo.',
+  risk: { label: 'At risk · doctor will re-check', short: 'At risk', ask: 'Maybe PCOD', tone: 'amber', tip: 'Your doctor will re-check. That’s a plan, not limbo.',
     line: '“Probable” means your doctor is watching for a bit longer before deciding. That’s normal for teens: periods can be irregular for a few years after they start, so doctors wait and re-check. It’s a plan, not limbo.' },
-  diagnosed: { label: 'Diagnosed by your doctor', short: 'Diagnosed', tone: 'lav', tip: 'Confirmed by your doctor. Now there’s a clear plan.',
+  diagnosed: { label: 'Diagnosed by your doctor', short: 'Diagnosed', ask: 'Yes, PCOD', tone: 'lav', tip: 'Confirmed by your doctor. Now there’s a clear plan.',
     line: 'Your doctor has now confirmed it. That can feel big, but it mostly means there’s a clear plan. Nothing about you changed overnight.' },
-  unsure: { label: 'Not sure yet', short: 'Not sure yet', tone: 'blue', tip: 'Still being checked. That’s normal at your age.',
+  unsure: { label: 'Not sure yet', short: 'Not sure yet', ask: 'Not sure yet', tone: 'blue', tip: 'Still being checked. That’s normal at your age.',
     line: 'Nothing is decided yet. Doctors look at your cycles over time and at signs like acne or extra hair, and they rule out other causes first.' }
 };
 
 /* ---------- The hormone loop ---------- */
-/* what: one plain sentence per step. levels: words for level 1 (calm) to 3 (loud). */
+/* Written for a worried 15–18 year old: everyday words first, doctor words last.
+   short: the one line she sees. normal / helps / word: behind "Explain more".
+   levels: gentle words for level 1 (calm) to 3 (busy). */
 KAHANI.loopNodes = {
-  brain:    { name: 'Brain', what: 'Sends LH, a “grow an egg” signal. In PCOD it’s <b>too loud</b>.',
-              levels: ['Calm', 'A bit loud', 'Loud'] },
-  ovary:    { name: 'Ovaries', what: 'Get over-nudged and make <b>extra androgens</b>. These cause acne and extra hair.',
-              levels: ['In range', 'A little extra', 'Extra'] },
-  follicle: { name: 'Egg sacs', what: 'Start growing, then <b>pause</b> before letting an egg go. Not cysts, just paused.',
-              levels: ['Mostly releasing', 'Some pausing', 'Pausing'] },
-  period:   { name: 'Period', what: 'No egg released, so the period <b>comes late or skips</b>.',
-              levels: ['Close to regular', 'A bit late', 'Late or skipping'] },
-  insulin:  { name: 'Insulin', what: 'The “key” that lets sugar into your cells. Extra insulin <b>pushes the ovaries harder</b>. Happens in thin girls too.',
-              levels: ['Lower', 'Upper end', 'High'] }
+  brain: { name: 'Your brain',
+    short: 'Your brain tells your ovaries “get an egg ready”. In PCOD it sends that message <b>a bit too often</b>, like a phone with too many notifications.',
+    normal: 'Normally it sends this message in calm, steady pulses through the month.',
+    helps: 'This usually settles with time and your doctor’s plan. There’s nothing you have to fix yourself.',
+    word: 'LH (luteinising hormone)',
+    levels: ['Calm', 'A bit busy', 'Busy'] },
+  ovary: { name: 'Your ovaries',
+    short: 'With all those messages, your ovaries make <b>a little extra</b> of a hormone every girl has. That’s what can show up as pimples or a few extra hairs.',
+    normal: 'Your ovaries are two small organs that keep your eggs and make hormones. Everyone makes a small amount of this one.',
+    helps: 'Pimples and extra hair can be treated. Ask your doctor what suits your skin.',
+    word: 'Androgens, testosterone',
+    levels: ['Balanced', 'A little extra', 'Extra'] },
+  follicle: { name: 'Your egg sacs',
+    short: 'Tiny egg sacs start growing, then <b>pause</b>, like a queue that stops moving. They’re not cysts, and they’re not harmful.',
+    normal: 'Each month a few tiny sacs grow, and one of them lets an egg go.',
+    helps: 'Lots of teens have sacs like this anyway, so at your age doctors don’t decide anything from a scan alone.',
+    word: 'Follicles, “PCO” on a scan',
+    levels: ['Mostly letting go', 'Some pausing', 'Pausing'] },
+  period: { name: 'Your period',
+    short: 'A period comes after an egg is let go. When the sacs pause, there’s no egg yet, so <b>the period comes late</b> or skips.',
+    normal: 'Usually an egg is let go, and about 2 weeks later your period starts.',
+    helps: 'Periods are often irregular in the first few years anyway. Your doctor will keep track of it with you.',
+    word: 'Ovulation, irregular cycles',
+    levels: ['Fairly regular', 'A bit late', 'Often late'] },
+  insulin: { name: 'Insulin, your sugar helper',
+    short: 'Insulin is like a <b>key</b> that lets sugar from your food into your cells for energy. Sometimes the body makes extra keys, and the extra gives the ovaries a nudge too.',
+    normal: 'After you eat, insulin opens your cells so sugar can go in and give you energy.',
+    helps: 'Regular meals, good sleep and moving in ways you enjoy help the keys work well. It’s not about your weight: thin girls can have this too.',
+    word: 'Insulin resistance',
+    levels: ['Working well', 'Working a bit harder', 'Working hard'] }
 };
 KAHANI.typicalLevels = { brain: 2, ovary: 2, follicle: 2, period: 2, insulin: 2 };
 
