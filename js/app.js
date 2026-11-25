@@ -509,7 +509,54 @@
   function patchLoop() {
     const w = $('.loopwrap'); if (!w) return;
     const n = +w.dataset.ch;
-    w.outerHTML = loopViz(n ? S.chapters[n - 1] : null);
+    const c = n ? S.chapters[n - 1] : null;
+    w.outerHTML = loopViz(c);
+    const m = $('.bodymap'); if (m) m.outerHTML = bodyMap(c);
+  }
+
+  /* Body map: a simple girl figure showing where each part of the loop lives.
+     Tap a part to jump to its step below. */
+  const SPOTS = [
+    { k: 'brain', node: 'brain', label: 'Brain', role: 'Sends messages', x: 131, y: 46, side: 'l', ly: 46 },
+    { k: 'insulin', node: 'insulin', label: 'Pancreas', role: 'Makes insulin', x: 178, y: 152, side: 'r', ly: 140 },
+    { k: 'ovary', node: 'ovary', label: 'Ovaries', role: 'Hold egg sacs', x: 186, y: 214, side: 'r', ly: 222 },
+    { k: 'period', node: 'period', label: 'Womb', role: 'Where periods come from', x: 145, y: 229, side: 'l', ly: 252 }
+  ];
+  function bodyMap(c) {
+    const p = prevOf(c);
+    const { lv } = loopData(c, p ? st.loopMode : 'mine');
+    const H = 340;
+    const lines = SPOTS.map((s) => {
+      const ex = s.side === 'l' ? 98 : 202;
+      return `<path class="bm-lead" d="M${s.x} ${s.y} L${(s.x + ex) / 2} ${s.ly} L${ex} ${s.ly}"/><circle class="bm-dot n-${s.node}" cx="${s.x}" cy="${s.y}" r="3.5"/>`;
+    }).join('');
+    const tags = SPOTS.map((s) => `<button class="bm-tag ${s.side} n-${s.node}" style="top:${(s.ly / H) * 100}%" data-act="bodyjump" data-arg="${s.k}" aria-label="${s.label}: ${s.role}. Show this step.">
+        <b>${s.label}</b>${c ? meter(s.node, lv[s.node] || 2) : `<small>${s.role}</small>`}
+      </button>`).join('');
+    return `<div class="bodymap" role="group" aria-label="Where each part is in your body">
+      <svg viewBox="0 0 300 ${H}" aria-hidden="true">
+        <g class="bm-fig">
+          <circle cx="178" cy="22" r="13" class="bm-hair"/>
+          <path class="bm-hair" d="M116 54c-2-30 16-44 34-44s36 14 34 44l2 22c-6-4-8-14-8-24-12 0-30-6-40-16-4 12-10 18-14 22-2 6-2 12-4 18z"/>
+          <circle cx="150" cy="50" r="30"/>
+          <rect x="141" y="76" width="18" height="18" rx="6"/>
+          <path d="M114 98 Q150 86 186 98 L178 172 Q200 230 202 266 Q150 280 98 266 Q100 230 122 172 Z"/>
+          <path d="M116 102 Q98 150 92 196 Q88 222 90 240" class="bm-limb"/>
+          <path d="M184 102 Q202 150 208 196 Q212 222 210 240" class="bm-limb"/>
+          <rect x="127" y="262" width="19" height="70" rx="9"/>
+          <rect x="154" y="262" width="19" height="70" rx="9"/>
+        </g>
+        <g class="bm-org n-brain"><path d="M132 47c-2-10 6-17 14-16 4-5 14-4 16 2 8 0 12 8 9 14 3 6-2 13-9 12-4 5-14 5-17 0-8 2-15-5-13-12z"/><path class="bm-fold" d="M150 34v26M140 42c4 2 6 6 4 10M160 42c-4 2-6 6-4 10"/></g>
+        <g class="bm-org n-insulin"><path d="M134 154c6-10 18-10 26-6 8-2 16 0 18 6-6 6-16 6-26 4-8 4-14 2-18-4z"/></g>
+        <g class="bm-org n-period">
+          <path class="bm-tube" d="M140 207c-8-6-14-2-18 4M160 207c8-6 14-2 18 4"/>
+          <path d="M138 204 Q150 198 162 204 Q162 220 156 228 Q150 234 144 228 Q138 220 138 204 Z"/>
+        </g>
+        <g class="bm-org n-ovary"><ellipse cx="122" cy="214" rx="8" ry="6"/><ellipse cx="178" cy="214" rx="8" ry="6"/><circle class="bm-sac" cx="120" cy="213" r="1.8"/><circle class="bm-sac" cx="125" cy="216" r="1.6"/><circle class="bm-sac" cx="176" cy="213" r="1.8"/><circle class="bm-sac" cx="181" cy="216" r="1.6"/></g>
+        ${lines}
+      </svg>
+      ${tags}
+    </div>`;
   }
 
   function cardHtml(c) {
@@ -735,6 +782,10 @@
     return `<section class="scr body">
       <h1 class="h-l">How PCOD works</h1>
       <p class="sub">${c ? `Set to your ${esc(c.visitLabel)}.` : 'The general picture. Add a report to see yours.'}</p>
+      <div class="card bm-card">
+        <p class="hint center">Tap a part to see what it does</p>
+        ${bodyMap(c)}
+      </div>
       <div class="card">${loopViz(c)}</div>
       ${c ? '' : `<div class="cta"><button class="btn block" data-act="go" data-arg="add">${icon('plus')} Add my report</button></div>`}
     </section>`;
@@ -947,6 +998,15 @@
     next: () => goCard(1),
     prev: () => goCard(-1),
     loopmode: (a) => { st.loopMode = a; patchLoop(); },
+    bodyjump: (a) => {
+      const step = $(`.loopwrap .step.n-${a}`); if (!step) return;
+      const v = $('#view');
+      /* layout offsets, not screen rects, so the desktop frame's zoom can't skew it */
+      let top = -12; let el = step;
+      while (el && el !== v) { top += el.offsetTop; el = el.offsetParent; }
+      v.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      step.classList.remove('flash'); void step.offsetWidth; step.classList.add('flash');
+    },
     stepmore: (a, el) => {
       const step = el.closest('.step'); const open = !step.classList.contains('open');
       step.classList.toggle('open', open); $('.expand', step).classList.toggle('open', open);
