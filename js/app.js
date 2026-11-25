@@ -1064,6 +1064,17 @@
   $('#tabbar').innerHTML = tabbarHtml();
   render();
 
+  /* Desktop preview: keep the iPhone at true size (414 × 868 incl. bezel) and
+     zoom the whole device to fit the window, so nothing inside gets squashed. */
+  const fitDevice = () => {
+    const root = document.documentElement;
+    if (!matchMedia('(min-width: 720px)').matches) { root.style.removeProperty('--fit'); return; }
+    const s = Math.min(1, (innerHeight - 48) / 868, (innerWidth - 48) / 414);
+    root.style.setProperty('--fit', Math.max(0.5, s).toFixed(3));
+  };
+  fitDevice();
+  window.addEventListener('resize', fitDevice);
+
   /* Installable app: register the offline worker when served over http(s). */
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
