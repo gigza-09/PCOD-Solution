@@ -41,7 +41,7 @@ KAHANI.reports = {
       { id: 'testo', icon: 'drop', plain: 'Testosterone a little high', tag: 'Testosterone ↑', node: 'ovary' },
       { id: 'insulin', icon: 'bolt', plain: 'Insulin at the upper end', tag: 'Insulin ↑', node: 'insulin' },
       { id: 'ruled', icon: 'check', plain: 'Thyroid and prolactin are normal', tag: 'Thyroid normal', node: null },
-      { id: 'scan', icon: 'info', plain: 'Scan note (scans don’t diagnose teens)', tag: 'Scan note', node: 'follicle' },
+      { id: 'scan', icon: 'info', plain: 'Scan note (scans don’t diagnose teens)', tag: 'Scan: paused sacs', node: 'follicle' },
       { id: 'note', icon: 'pen', plain: 'Doctor: “probable PCOD”, re-check in 3 months', tag: 'Probable PCOD', node: null }
     ],
     levels: { brain: 3, ovary: 2, follicle: 3, period: 3, insulin: 2 },
@@ -110,12 +110,18 @@ KAHANI.statusInfo = {
 };
 
 /* ---------- The hormone loop ---------- */
+/* what: one plain sentence per step. levels: words for level 1 (calm) to 3 (loud). */
 KAHANI.loopNodes = {
-  brain:    { name: 'Brain signal', sub: 'LH', text: 'Your brain sends LH, a signal that says “grow an egg”. In PCOD it pulses faster and louder than usual, so the ovaries get over-nudged.' },
-  ovary:    { name: 'Ovaries', sub: 'androgens', text: 'Over-nudged ovaries make extra androgens. Everyone makes some of these “male-type” hormones; here there’s more. They’re behind acne and extra hair.' },
-  follicle: { name: 'Egg sacs', sub: 'pause', text: 'With too much LH and androgen, the small egg sacs start growing and then pause before releasing an egg. They’re not real cysts, just paused sacs.' },
-  period:   { name: 'Period', sub: 'skips', text: 'No egg released means no “brake” signal back to the brain, and no period on schedule. So the loop keeps going and periods come late or skip.' },
-  insulin:  { name: 'Insulin', sub: 'booster', text: 'Insulin moves sugar into your cells. When the body needs extra of it, the extra also tells the ovaries to make more androgens. That happens in thin people too.' }
+  brain:    { name: 'Brain', what: 'Sends LH, a “grow an egg” signal. In PCOD it’s <b>too loud</b>.',
+              levels: ['Calm', 'A bit loud', 'Loud'] },
+  ovary:    { name: 'Ovaries', what: 'Get over-nudged and make <b>extra androgens</b>. These cause acne and extra hair.',
+              levels: ['In range', 'A little extra', 'Extra'] },
+  follicle: { name: 'Egg sacs', what: 'Start growing, then <b>pause</b> before letting an egg go. Not cysts, just paused.',
+              levels: ['Mostly releasing', 'Some pausing', 'Pausing'] },
+  period:   { name: 'Period', what: 'No egg released, so the period <b>comes late or skips</b>.',
+              levels: ['Close to regular', 'A bit late', 'Late or skipping'] },
+  insulin:  { name: 'Insulin', what: 'The “key” that lets sugar into your cells. Extra insulin <b>pushes the ovaries harder</b>. Happens in thin girls too.',
+              levels: ['Lower', 'Upper end', 'High'] }
 };
 KAHANI.typicalLevels = { brain: 2, ovary: 2, follicle: 2, period: 2, insulin: 2 };
 

@@ -44,9 +44,43 @@
     users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 5.5 5"/>',
     brain: '<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a3 3 0 0 0-3-1z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/>',
-    bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'
+    bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    loop: '<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.5h-4.5"/>',
+    body: '<circle cx="12" cy="5" r="2.5"/><path d="M12 8v7M8 10.5h8M9.5 21l2.5-6 2.5 6"/>'
   };
   const icon = (n, cls) => `<svg class="ic ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ICONS.info}</svg>`;
+
+  /* Literal pictures for each part of the loop */
+  const ILLUS = {
+    brain: `<circle cx="32" cy="32" r="31" fill="#efe9ff"/>
+      <path d="M31 17c-3-3-9-3-11 1-5 0-8 5-6 9-4 3-3 9 1 11 0 5 5 8 9 6 2 3 5 3 7 1z" fill="#f7a8c6"/>
+      <path d="M33 17c3-3 9-3 11 1 5 0 8 5 6 9 4 3 3 9-1 11 0 5-5 8-9 6-2 3-5 3-7 1z" fill="#f28fb5"/>
+      <path d="M32 18v27M21 26c3 0 5 2 5 5M43 26c-3 0-5 2-5 5M19 36c3-1 6 0 7 3M45 36c-3-1-6 0-7 3" stroke="#c4527f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <g stroke="#7a5af5" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M47 11a9 9 0 0 1 5 6"/><path d="M50 6a15 15 0 0 1 8 10"/></g>`,
+    ovary: `<circle cx="32" cy="32" r="31" fill="#ffe6ef"/>
+      <path d="M22 24 Q32 20 42 24 L38 39 Q32 43 26 39Z" fill="#f28fb5"/>
+      <rect x="29" y="40" width="6" height="9" rx="3" fill="#f28fb5"/>
+      <path d="M23 25 Q17 19 12 26M41 25 Q47 19 52 26" stroke="#f28fb5" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="13" cy="31" rx="6" ry="4.5" fill="#ffb68f"/><ellipse cx="51" cy="31" rx="6" ry="4.5" fill="#ffb68f"/>
+      <g fill="#ee8a2e"><circle cx="9" cy="20" r="2.2"/><circle cx="15" cy="16" r="1.7"/><circle cx="49" cy="16" r="1.7"/><circle cx="55" cy="20" r="2.2"/></g>`,
+    follicle: `<circle cx="32" cy="32" r="31" fill="#fff0de"/>
+      <ellipse cx="32" cy="32" rx="21" ry="16" fill="#ffc9a3"/>
+      <g fill="#fff" stroke="#ee8a2e" stroke-width="1.6"><circle cx="16.5" cy="30" r="4"/><circle cx="22" cy="21" r="3.6"/><circle cx="32" cy="18" r="3.6"/><circle cx="42" cy="21" r="3.6"/><circle cx="47.5" cy="30" r="4"/><circle cx="43" cy="40" r="3.6"/><circle cx="32" cy="44" r="3.6"/><circle cx="21" cy="40" r="3.6"/></g>
+      <circle cx="32" cy="31" r="7" fill="#ee8a2e"/><path d="M29.5 28v6M34.5 28v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>`,
+    period: `<circle cx="32" cy="32" r="31" fill="#ffe1e7"/>
+      <rect x="13" y="16" width="38" height="34" rx="6" fill="#fff"/>
+      <path d="M13 22a6 6 0 0 1 6-6h26a6 6 0 0 1 6 6v3H13z" fill="#d33a54"/>
+      <path d="M22 12v7M42 12v7" stroke="#8f2238" stroke-width="2.6" stroke-linecap="round"/>
+      <g fill="#eadde1"><circle cx="21" cy="32" r="2.2"/><circle cx="29" cy="32" r="2.2"/><circle cx="37" cy="32" r="2.2"/><circle cx="45" cy="32" r="2.2"/><circle cx="21" cy="41" r="2.2"/><circle cx="29" cy="41" r="2.2"/></g>
+      <circle cx="40" cy="41" r="5.5" fill="none" stroke="#d33a54" stroke-width="1.6" stroke-dasharray="2.2 2"/>
+      <text x="40" y="44.6" font-size="10" font-weight="800" text-anchor="middle" fill="#d33a54" font-family="Nunito, sans-serif">?</text>`,
+    insulin: `<circle cx="32" cy="32" r="31" fill="#fff4d4"/>
+      <rect x="11" y="35" width="14" height="14" rx="3" fill="#fff" stroke="#d9a300" stroke-width="2"/>
+      <rect x="19" y="25" width="14" height="14" rx="3" fill="#fff" stroke="#d9a300" stroke-width="2"/>
+      <circle cx="45" cy="25" r="7" fill="none" stroke="#d9a300" stroke-width="3.2"/>
+      <path d="M45 32v15M45 41h5M45 46h4" stroke="#d9a300" stroke-width="3.2" stroke-linecap="round"/>`
+  };
+  const illus = (k, cls) => `<svg class="illus ${cls || ''}" viewBox="0 0 64 64" aria-hidden="true">${ILLUS[k] || ''}</svg>`;
 
   /* Tara — original illustrated peer guide (she blinks) */
   function tara(size, mood) {
@@ -74,13 +108,15 @@
   /* ---------- state ---------- */
   const fresh = () => ({
     screen: 'home', report: null, source: null, phase: 'scan', rejected: {}, status: null,
-    chIndex: null, card: 0, loopMode: 'mine', node: null, chat: [], ctx: null, group: 'A',
+    chIndex: null, card: 0, loopMode: 'mine', chat: [], ctx: null, group: 'A',
     paused: false, mumLang: 'en', teachFb: null, typing: false,
     hidden: false, sheet: null, sheetAnim: false, anim: null
   });
   let st = fresh();
-  const ORDER = ['home', 'add', 'read', 'chapter', 'ask', 'done'];
-  const STEP_LABEL = { add: 'Add', read: 'Check', chapter: 'Chapter', ask: 'Ask', done: 'Done' };
+  const ORDER = ['home', 'body', 'ask', 'doctor', 'add', 'read', 'chapter', 'done'];
+  const FLOW = ['add', 'read', 'chapter', 'done'];
+  const STEP_LABEL = { add: 'Add', read: 'Check', chapter: 'Learn', done: 'Done' };
+  const TABS = [['home', 'book', 'Story'], ['body', 'body', 'My body'], ['ask', 'chat', 'Ask'], ['doctor', 'doc', 'Doctor']];
   let lastScreen = null;
 
   const chapter = () => (st.chIndex != null ? S.chapters[st.chIndex] : S.last());
@@ -102,13 +138,18 @@
 
   /* ---------- top bar (persistent, so the progress bar animates) ---------- */
   function updateTop() {
-    const steps = ['add', 'read', 'chapter', 'ask', 'done'];
-    const i = steps.indexOf(st.screen);
-    $('#app').classList.toggle('in-flow', i >= 0);
+    const i = FLOW.indexOf(st.screen);
+    const app = $('#app');
+    app.classList.toggle('in-flow', i >= 0);
+    app.classList.toggle('has-tabs', i < 0);
     if (i >= 0) {
-      $('#progfill').style.width = ((i + 1) / steps.length * 100) + '%';
-      $('#proglabel').textContent = `${i + 1} of 5 · ${STEP_LABEL[st.screen]}`;
+      $('#progfill').style.width = ((i + 1) / FLOW.length * 100) + '%';
+      $('#proglabel').textContent = `${i + 1} of ${FLOW.length} · ${STEP_LABEL[st.screen]}`;
     }
+    $$('#tabbar button').forEach((b) => { const on = b.dataset.arg === st.screen; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'page' : 'false'); });
+  }
+  function tabbarHtml() {
+    return TABS.map(([k, ic, l]) => `<button data-act="tab" data-arg="${k}">${icon(ic)}<span>${l}</span></button>`).join('');
   }
 
   /* ---------- HOME ---------- */
@@ -274,76 +315,64 @@
   }
 
   /* ---------- 3. CHAPTER ---------- */
-  const cardsFor = (c) => (S.chapters[c.n - 2] ? ['welcome', 'changed', 'loop', 'status', 'carried'] : ['intro', 'name', 'loop', 'signs', 'fault']);
+  const prevOf = (c) => (c ? S.chapters[c.n - 2] || null : null);
+  const cardsFor = (c) => (prevOf(c) ? ['changed', 'loop', 'carried'] : ['name', 'loop', 'fault']);
   const CTX = {
-    intro: ['A1', 'A14', 'C4'], name: ['A1', 'B2', 'A10'], loop: ['A3', 'A6', 'B6'], signs: ['A6', 'A12', 'C8'],
-    fault: ['A11', 'B7', 'B1'], welcome: ['A10', 'B7', 'C1'], changed: ['C1', 'A10', 'B4'], status: ['A1', 'B1', 'A10'], carried: ['B5', 'A14', 'C1']
+    name: ['A1', 'B2', 'A14'], loop: ['A3', 'A6', 'B6'], fault: ['A11', 'B7', 'B1'],
+    changed: ['C1', 'A10', 'B4'], carried: ['B5', 'A14', 'C1']
   };
-  const NODE_POS = { brain: [50, 14], ovary: [84, 50], follicle: [50, 86], period: [16, 50], insulin: [50, 50] };
-  const NODE_ICON = { brain: 'brain', ovary: 'drop', follicle: 'pause', period: 'calendar', insulin: 'bolt' };
+
+  /* The loop, drawn as a picture story: Brain → Ovaries → Egg sacs → Period → repeat, with insulin as a booster. */
+  const CHAIN = ['brain', 'ovary', 'follicle', 'period'];
+  const LINKS = { brain: 'loud signal', ovary: 'extra androgens', follicle: 'no egg released' };
 
   function loopData(c, mode) {
-    const p = prevChapter();
+    if (!c) return { lv: K.typicalLevels, pins: {} };
+    const p = prevOf(c);
     let lv = c.levels; let items = c.items;
-    if (mode === 'typical') { lv = K.typicalLevels; items = []; }
     if (mode === 'then' && p) { lv = p.levels; items = p.items; }
     const pins = {};
     items.forEach((it) => { if (it.node) (pins[it.node] = pins[it.node] || []).push(it); });
     return { lv, pins };
   }
-
-  function loopViz(c) {
-    const p = prevChapter();
-    const mode = st.loopMode;
-    const { lv, pins } = loopData(c, mode);
-    const toggles = p ? [['then', 'Then'], ['mine', 'Now']] : [['mine', 'My pattern'], ['typical', 'Typical']];
-    const nodes = Object.keys(NODE_POS).map((k) => `<button class="lnode n-${k} ${st.node === k ? 'sel' : ''}" style="left:${NODE_POS[k][0]}%;top:${NODE_POS[k][1]}%;--lv:${lv[k]}" data-act="node" data-arg="${k}" aria-label="${K.loopNodes[k].name}">
-        <span class="orb">${icon(NODE_ICON[k])}</span><span class="nm">${K.loopNodes[k].name}</span>
-        <span class="cnt ${(pins[k] || []).length ? '' : 'z'}">${(pins[k] || []).length}</span>
-      </button>`).join('');
-    return `<div class="loopwrap">
-      <div class="seg" role="tablist" aria-label="Loop view">${toggles.map(([k, l]) => `<button role="tab" aria-selected="${mode === k}" class="${mode === k ? 'on' : ''}" data-act="loopmode" data-arg="${k}">${l}</button>`).join('')}</div>
-      <div class="loop" id="loop">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a48cf5"/></marker></defs>
-          <path class="flow" data-n="brain" d="M60 12 Q80 14 83 34" marker-end="url(#ah)" style="--s:${spd(lv.brain)}"/>
-          <path class="flow" data-n="ovary" d="M83 66 Q80 86 61 88" marker-end="url(#ah)" style="--s:${spd(lv.ovary)}"/>
-          <path class="flow" data-n="follicle" d="M39 88 Q20 86 17 66" marker-end="url(#ah)" style="--s:${spd(lv.follicle)}"/>
-          <path class="flow" data-n="period" d="M17 34 Q20 14 39 12" marker-end="url(#ah)" style="--s:${spd(lv.period)}"/>
-          <path class="flow fi" data-n="insulin" d="M60 50 L71 50" marker-end="url(#ah)" style="--s:${spd(lv.insulin)}"/>
-        </svg>
-        ${nodes}
+  function meter(k, l) {
+    return `<span class="lvl l${l}"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${K.loopNodes[k].levels[l - 1]}</span>`;
+  }
+  function stepHtml(k, lv, pins, i, personal) {
+    const N = K.loopNodes[k];
+    const mine = pins[k] || [];
+    return `<li class="step n-${k}" style="--d:${i * 70}ms">
+      ${illus(k)}
+      <div class="step-t">
+        <div class="step-h"><b>${N.name}</b>${personal ? meter(k, lv[k] || 2) : ''}</div>
+        <p>${N.what}</p>
+        ${mine.length ? `<div class="pins"><small>You</small>${mine.map((x) => `<span class="chip">${esc(x.tag || x.plain)}</span>`).join('')}</div>` : ''}
       </div>
-      <div class="nodeslot" id="nodeslot">${nodeCard(c)}</div>
+    </li>`;
+  }
+  function loopViz(c) {
+    const p = prevOf(c);
+    const mode = p ? st.loopMode : 'mine';
+    const { lv, pins } = loopData(c, mode);
+    const personal = !!c;
+    const chain = CHAIN.map((k, i) => stepHtml(k, lv, pins, i, personal) +
+      (LINKS[k] ? `<li class="link" aria-hidden="true">${icon('down')}<span>${LINKS[k]}</span></li>` : '')).join('');
+    return `<div class="loopwrap" data-ch="${c ? c.n : 0}">
+      ${p ? `<div class="seg" role="tablist" aria-label="Compare visits">${[['then', esc(p.visitLabel)], ['mine', esc(c.visitLabel)]].map(([k, l]) => `<button role="tab" aria-selected="${mode === k}" class="${mode === k ? 'on' : ''}" data-act="loopmode" data-arg="${k}">${l}</button>`).join('')}</div>` : ''}
+      <ol class="chain">
+        ${chain}
+        <li class="repeat">${icon('loop')}<span>No egg means no “slow down” message to the brain, so <b>the loop repeats</b>.</span></li>
+      </ol>
+      <div class="boost">
+        <span class="boost-tag">${icon('bolt')} Booster</span>
+        <ul class="chain">${stepHtml('insulin', lv, pins, 5, personal)}</ul>
+      </div>
     </div>`;
   }
-  const spd = (l) => (2.6 - (l || 1) * 0.6).toFixed(2) + 's';
-  function nodeCard(c) {
-    if (!st.node) return '<p class="hint">Tap a circle to see what it does</p>';
-    const N = K.loopNodes[st.node];
-    const { pins } = loopData(c, st.loopMode);
-    const mine = pins[st.node] || [];
-    return `<div class="nodecard n-${st.node}"><b>${N.name}</b><p>${N.text}</p>${mine.length ? `<div class="pins">${mine.map((x) => `<span class="chip">${esc(x.tag || x.plain)}</span>`).join('')}</div>` : ''}</div>`;
-  }
   function patchLoop() {
-    const c = chapter();
-    const { lv, pins } = loopData(c, st.loopMode);
-    $$('.loopwrap .seg button').forEach((b) => { const on = b.dataset.arg === st.loopMode; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
-    $$('#loop .lnode').forEach((b) => {
-      const k = b.dataset.arg;
-      b.style.setProperty('--lv', lv[k]);
-      const cnt = $('.cnt', b); const n = (pins[k] || []).length;
-      cnt.textContent = n; cnt.classList.toggle('z', !n);
-    });
-    $$('#loop .flow').forEach((f) => f.style.setProperty('--s', spd(lv[f.dataset.n])));
-    patchNode(false);
-  }
-  function patchNode(animate) {
-    $$('#loop .lnode').forEach((b) => b.classList.toggle('sel', b.dataset.arg === st.node));
-    const slot = $('#nodeslot');
-    if (!slot) return;
-    slot.innerHTML = nodeCard(chapter());
-    if (animate && slot.firstElementChild) slot.firstElementChild.classList.add('pop');
+    const w = $('.loopwrap'); if (!w) return;
+    const n = +w.dataset.ch;
+    w.outerHTML = loopViz(n ? S.chapters[n - 1] : null);
   }
 
   function cardHtml(c) {
@@ -353,11 +382,8 @@
     const s = K.statusInfo[c.status];
     let say = ''; let body = '';
 
-    if (key === 'intro') {
-      say = 'Hi, I’m Tara! I’m an AI guide, <b>not a doctor</b>. We’ll go one small step at a time.';
-      body = `<ol class="toc">${['The name', 'Your loop', 'Your signs', 'Whose fault? Nobody’s'].map((t, i) => `<li style="--d:${i * 60}ms"><span>${i + 1}</span>${t}</li>`).join('')}</ol>`;
-    } else if (key === 'name') {
-      say = 'Three names. <b>One thing.</b>';
+    if (key === 'name') {
+      say = 'Hi, I’m Tara, an AI guide, <b>not a doctor</b>. First: three names, <b>one thing</b>.';
       body = `<div class="names">
         <div class="nm-pill"><b>PCOD</b><small>India</small></div><span class="eq">=</span>
         <div class="nm-pill"><b>PCOS</b><small>Doctors</small></div><span class="eq">=</span>
@@ -365,33 +391,24 @@
       </div>
       <p class="note">${icon('bulb')} No real cysts, just <b>paused egg sacs</b>.</p>`;
     } else if (key === 'loop') {
-      say = p ? 'Then vs now. <b>Switch and watch.</b>' : 'This is <b>your</b> loop, set to your report.';
+      say = p ? 'Switch between visits and <b>watch what changed</b>.' : 'Here’s what’s going on, <b>step by step</b>. Your signs are on each step.';
       body = loopViz(c);
-    } else if (key === 'signs') {
-      say = 'Not a random list. <b>One loop.</b>';
-      const by = {};
-      c.items.forEach((it) => { if (it.node) (by[it.node] = by[it.node] || []).push(it); });
-      const keys = Object.keys(K.loopNodes).filter((k) => by[k]);
-      body = keys.length ? `<ul class="signs">${keys.map((k, i) => `<li class="n-${k}" style="--d:${i * 60}ms"><span class="sg-dot"></span><b>${K.loopNodes[k].name}</b><div class="pins">${by[k].map((x) => `<span class="chip">${esc(x.tag || x.plain)}</span>`).join('')}</div></li>`).join('')}</ul>` : '<p class="hint">No signs confirmed yet. That’s okay.</p>';
     } else if (key === 'fault') {
       say = 'The most important part:';
-      body = `<div class="bigmsg">${icon('heart')}<b>You didn’t cause this.</b><p>Genes plus environment. Not your food, not stress, not your mum.</p></div>
-        <div class="statusline"><span class="chip t-${s.tone}">${s.short}</span><span>${esc(s.tip)}</span></div>`;
-    } else if (key === 'welcome') {
-      say = `Welcome back! Here’s what changed since <b>${esc(p.visitLabel.replace(' visit', ''))}</b>.`;
-      body = `<div class="visits"><div class="vcard old"><small>Ch ${p.n}</small><b>${esc(p.visitLabel)}</b><span class="chip t-${K.statusInfo[p.status].tone}">${K.statusInfo[p.status].short}</span></div>${icon('right', 'varrow')}<div class="vcard"><small>Ch ${c.n}</small><b>${esc(c.visitLabel)}</b><span class="chip t-${s.tone}">${s.short}</span></div></div>`;
+      body = `<div class="bigmsg">${icon('heart')}<b>You didn’t cause this.</b><p>Genes plus environment. Not your food, not stress, not your mum.</p></div>`;
     } else if (key === 'changed') {
-      const rows = [['cycle', 'Period gap'], ['lh', 'LH signal'], ['testo', 'Testosterone'], ['insulin', 'Insulin']]
-        .filter(([k]) => p.facts[k] && c.facts[k])
-        .map(([k, l], i) => `<li style="--d:${i * 60}ms"><span class="d-l">${l}</span><span class="was">${esc(p.facts[k])}</span>${icon('right')}<span class="now">${esc(c.facts[k])}</span></li>`).join('');
-      say = c.improved ? 'Your loop got <b>quieter</b>.' : 'Here’s your new report, next to last time.';
-      body = (rows ? `<ul class="diff">${rows}</ul>` : `<div class="pins">${c.items.filter((i) => i.node).map((i) => `<span class="chip">${esc(i.tag)}</span>`).join('')}</div>`) +
-        (c.improved ? `<p class="note">${icon('pill')} Some of this may be your treatment. Ask your doctor which part.</p>` : '');
-    } else if (key === 'status') {
       const ps = K.statusInfo[p.status];
-      say = p.status !== c.status ? 'Your status <b>changed</b> this visit.' : 'Your status is the same as last time.';
-      body = `<div class="statemove"><span class="chip t-${ps.tone}">${ps.short}</span>${icon('right')}<span class="chip t-${s.tone} big">${s.short}</span></div>
-        <p class="tip">${esc(s.tip)}${c.status === 'diagnosed' ? ' “PCOS” on your report means PCOD.' : ''}</p>`;
+      const rows = [['cycle', 'period', 'Period gap'], ['lh', 'brain', 'Brain signal'], ['testo', 'ovary', 'Testosterone'], ['insulin', 'insulin', 'Insulin']]
+        .filter(([k]) => p.facts[k] && c.facts[k])
+        .map(([k, n, l], i) => `<li style="--d:${i * 60}ms">${illus(n, 'sm')}<span class="d-l">${l}</span><span class="d-v"><span class="was">${esc(p.facts[k])}</span>${icon('right')}<span class="now">${esc(c.facts[k])}</span></span></li>`).join('');
+      say = `Welcome back! ${c.improved ? 'Since your ' + esc(p.visitLabel) + ', your loop got <b>quieter</b>.' : 'Here’s your new report next to your ' + esc(p.visitLabel) + '.'}`;
+      body = `<div class="visits">
+          <div class="vcard old"><small>${esc(p.visitLabel)}</small><span class="chip t-${ps.tone}">${ps.short}</span></div>${icon('right', 'varrow')}
+          <div class="vcard"><small>${esc(c.visitLabel)}</small><span class="chip t-${s.tone}">${s.short}</span></div>
+        </div>
+        ${p.status !== c.status ? `<p class="tip">${esc(s.tip)}${c.status === 'diagnosed' ? ' “PCOS” on your report means PCOD.' : ''}</p>` : ''}
+        ${rows ? `<ul class="diff">${rows}</ul>` : ''}
+        ${c.improved ? `<p class="note">${icon('pill')} Some of this may be your treatment. Ask your doctor which part.</p>` : ''}`;
     } else if (key === 'carried') {
       const qs = p.doctorQs.filter((q) => !q.skip);
       say = 'Did you get answers to <b>last time’s questions</b>?';
@@ -431,7 +448,7 @@
     const n = cardsFor(c).length;
     const to = Math.max(0, Math.min(n - 1, st.card + delta));
     if (to === st.card) return;
-    st.card = to; st.node = null;
+    st.card = to;
     if (cardsFor(c)[to] === 'loop') st.loopMode = 'mine';
     const slot = $('#cardslot');
     slot.innerHTML = cardHtml(c);
@@ -497,10 +514,10 @@
 
   function askScreen() {
     return `<section class="scr ask">
-      <div class="ch-head">
+      ${st.ctx ? `<div class="ch-head">
         <button class="back" data-act="go" data-arg="chapter">${icon('left')} Chapter</button>
         <button class="btn xs" data-act="finish">Finish ${icon('star')}</button>
-      </div>
+      </div>` : '<h1 class="h-l">Ask Tara</h1>'}
       <ul class="chatlog" id="chatlog" aria-live="polite">
         <li class="msg intro"><div class="say">${tara(44)}<p class="bubble">Ask me anything, even the awkward stuff. I’ll always say <b>how sure I am</b>.</p></div></li>
         ${st.chat.map(msgHtml).join('')}
@@ -562,15 +579,47 @@
       <h1 class="h-l center">${c.n === 1 ? 'You know your loop!' : 'Your story moved on'}</h1>
       <p class="sub center">Take it with you:</p>
       <div class="tiles">
-        <button class="tile" data-act="sheet" data-arg="qs" style="--d:0ms"><span class="tile-ic lav">${icon('doc')}</span><b>Questions for my doctor</b><small id="qcount">${nq} ready</small>${icon('right', 'chev')}</button>
+        <button class="tile" data-act="tab" data-arg="doctor" style="--d:0ms"><span class="tile-ic lav">${icon('doc')}</span><b>Questions for my doctor</b><small>${nq} ready</small>${icon('right', 'chev')}</button>
         <button class="tile" data-act="sheet" data-arg="teach" style="--d:70ms"><span class="tile-ic sun">${icon('bulb')}</span><b>Explain it back</b><small>${c.teach ? 'Done' : '30 seconds'}</small>${icon('right', 'chev')}</button>
         <button class="tile" data-act="sheet" data-arg="mum" style="--d:140ms"><span class="tile-ic pink">${icon('mail')}</span><b>A message for Mum</b><small>Optional</small>${icon('right', 'chev')}</button>
       </div>
       <div class="cta col">
         ${keepToggle('done')}
-        <button class="btn block" data-act="go" data-arg="home">${icon('book')} Back to my story</button>
+        <button class="btn block" data-act="tab" data-arg="home">${icon('book')} Back to my story</button>
         <button class="linkbtn danger" data-act="wipe">End and clear everything</button>
       </div>
+    </section>`;
+  }
+
+  /* ---------- tab: MY BODY ---------- */
+  function bodyScreen() {
+    const c = S.last();
+    return `<section class="scr body">
+      <h1 class="h-l">How PCOD works</h1>
+      <p class="sub">${c ? `Set to your ${esc(c.visitLabel)}.` : 'The general picture. Add a report to see yours.'}</p>
+      <div class="card">${loopViz(c)}</div>
+      ${c ? '' : `<div class="cta"><button class="btn block" data-act="go" data-arg="add">${icon('plus')} Add my report</button></div>`}
+    </section>`;
+  }
+
+  /* ---------- tab: DOCTOR ---------- */
+  function qlistHtml(c) {
+    return `<ul class="qlist">${c.doctorQs.map((q, i) => `<li><label><input type="checkbox" data-act="qtoggle" data-arg="${i}" ${q.skip ? '' : 'checked'}><span>${esc(q.text)}${q.from === 'chat' ? '<small>You asked</small>' : q.from === 'carried' ? '<small>From last time</small>' : ''}</span></label></li>`).join('')}</ul>`;
+  }
+  function doctorScreen() {
+    const c = S.last();
+    if (!c) {
+      return `<section class="scr doctor">
+        <h1 class="h-l">For your doctor</h1>
+        <div class="empty">${illus('brain')}<p>Add a report and I’ll write questions to take to your next visit.</p></div>
+        <div class="cta"><button class="btn block" data-act="go" data-arg="add">${icon('plus')} Add my report</button></div>
+      </section>`;
+    }
+    return `<section class="scr doctor">
+      <h1 class="h-l">For your doctor</h1>
+      <p class="sub">Tick the ones you want to ask at your next visit.</p>
+      ${qlistHtml(c)}
+      <div class="cta"><div class="row2"><button class="btn ghost" data-act="copyqs">${icon('copy')} Copy</button><button class="btn" data-act="dlqs">${icon('download')} Save</button></div></div>
     </section>`;
   }
 
@@ -594,10 +643,6 @@
           <div class="seg sm" role="tablist">${Object.keys(groups).map((g) => `<button role="tab" aria-selected="${st.group === g}" class="${st.group === g ? 'on' : ''}" data-act="group" data-arg="${g}">${groups[g]}</button>`).join('')}</div>
           <div class="qgrid" id="qgrid">${qgrid()}</div>`;
       }
-      case 'qs':
-        return `<h2 class="h-m">${icon('doc')} Questions for my doctor</h2>
-          <ul class="qlist">${c.doctorQs.map((q, i) => `<li><label><input type="checkbox" data-act="qtoggle" data-arg="${i}" ${q.skip ? '' : 'checked'}><span>${esc(q.text)}${q.from === 'chat' ? '<small>You asked</small>' : q.from === 'carried' ? '<small>From last time</small>' : ''}</span></label></li>`).join('')}</ul>
-          <div class="row2"><button class="btn sm ghost" data-act="copyqs">${icon('copy')} Copy</button><button class="btn sm" data-act="dlqs">${icon('download')} Save</button></div>`;
       case 'teach':
         return `<h2 class="h-m">${icon('bulb')} Explain it back</h2>
           <p class="hint">In one line, how would you explain your loop to a friend?</p>
@@ -638,7 +683,7 @@
   }
 
   /* ---------- render ---------- */
-  const VIEWS = { home, add, read, chapter: chapterScreen, ask: askScreen, done: doneScreen };
+  const VIEWS = { home, body: bodyScreen, ask: askScreen, doctor: doctorScreen, add, read, chapter: chapterScreen, done: doneScreen };
   function render() {
     const view = $('#view');
     const changed = st.screen !== lastScreen;
@@ -686,11 +731,12 @@
 
   const acts = {
     go: (a) => { if (a === 'chapter') st.ctx = null; go(a); },
+    tab: (a) => { if (a === st.screen) { $('#view').scrollTo({ top: 0, behavior: 'smooth' }); return; } Object.assign(st, { chIndex: null, ctx: null, loopMode: 'mine', anim: 'fade' }); go(a); },
     hide: () => { st.hidden = true; $('#toast').classList.remove('show'); renderLayer(); },
     unhide: () => { st.hidden = false; renderLayer(); },
     sheet: (a) => openSheet(a),
     closesheet: () => closeSheet(),
-    opench: (a) => { Object.assign(st, { chIndex: +a, card: 0, loopMode: 'mine', node: null, chat: [], paused: false }); go('chapter'); },
+    opench: (a) => { Object.assign(st, { chIndex: +a, card: 0, loopMode: 'mine', chat: [], paused: false }); go('chapter'); },
     sample: () => { const r = nextSample(); if (r) startRead(r, 'sample'); },
     tellopen: (a, el) => {
       const box = el.closest('.tell'); const open = !box.classList.contains('open');
@@ -718,7 +764,6 @@
     next: () => goCard(1),
     prev: () => goCard(-1),
     loopmode: (a) => { st.loopMode = a; patchLoop(); },
-    node: (a) => { st.node = st.node === a ? null : a; patchNode(true); },
     carry: (a, el) => {
       const [i, v] = a.split(':'); const p = prevChapter(); const c = chapter();
       const q = p.doctorQs.filter((x) => !x.skip)[+i];
@@ -742,6 +787,7 @@
     more: (a) => { const m = st.chat[+a]; m.open = !m.open; const el = $(`.chatlog [data-i="${a}"]`); el.classList.toggle('open', m.open); $('.expand', el).classList.toggle('open', m.open); $('.more', el).textContent = m.open ? 'Less' : (String(m.text).includes('<br><br>') ? 'Tell me more' : 'Source'); },
     addq: (a) => {
       const m = st.chat[+a]; const c = chapter();
+      if (!c) { toast('Add a report first to start your doctor list'); return; }
       if (!c.doctorQs.some((q) => q.text === m.doctorQ)) c.doctorQs.push({ text: m.doctorQ, from: 'chat' });
       m.added = true; S.persist(); rerenderMsg(+a); toast('Added to your doctor list');
     },
@@ -808,5 +854,11 @@
     if (e.key === 'Enter' && e.target.matches && e.target.matches('label.opt')) $('input', e.target).click();
   });
 
+  $('#tabbar').innerHTML = tabbarHtml();
   render();
+
+  /* Installable app: register the offline worker when served over http(s). */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
 })();

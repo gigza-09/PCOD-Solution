@@ -1,0 +1,15 @@
+{
+  "name": "Kahani · Your PCOD story",
+  "short_name": "Kahani",
+  "description": "A private, teen-safe guide that turns a PCOD report into a story you understand.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f2ff",
+  "theme_color": "#f6f2ff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
