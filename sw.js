@@ -1,6 +1,6 @@
 /* Kahani offline worker: lets the app open without a connection once installed.
    Network first, so updates show up straight away; the cache is only a fallback. */
-const CACHE = 'kahani-v1';
+const CACHE = 'kahani-v2';
 const FILES = ['./', 'index.html', 'css/styles.css', 'js/data.js', 'js/story.js', 'js/app.js', 'icon.svg', 'manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
@@ -15,10 +15,12 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const own = new URL(e.request.url).origin === location.origin;
   e.respondWith(
-    fetch(e.request)
+    /* no-cache: always ask the server whether there's a newer version, so updates show on the next load */
+    fetch(e.request, own ? { cache: 'no-cache' } : undefined)
       .then((res) => {
-        if (res.ok && new URL(e.request.url).origin === location.origin) {
+        if (res.ok && own) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }
